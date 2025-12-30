@@ -30,7 +30,7 @@ Automatically discovers patterns from your development history and generates reu
 /plugin marketplace add usedhonda/claude-skills
 
 # Then install
-/plugin install skill-from-history@usedhonda/claude-skills
+/plugin install skill-from-history@usedhonda-claude-skills
 ```
 
 ### Manual Installation
@@ -106,7 +106,7 @@ Claude Code用スキルコレクション
 ```bash
 # プラグイン経由（推奨）
 /plugin marketplace add usedhonda/claude-skills
-/plugin install skill-from-history@usedhonda/claude-skills
+/plugin install skill-from-history@usedhonda-claude-skills
 
 # 手動
 mkdir -p ~/.claude/skills/skill-from-history
