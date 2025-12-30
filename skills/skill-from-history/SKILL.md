@@ -34,6 +34,8 @@ Files analyzed:
 - Tool calls and their sequences
 - Code changes and file modifications
 - Repeated problem-solving approaches
+- **Rejection patterns** (user corrections, "don't do X", "not like that")
+- **Failed attempts** (assistant proposals rejected by user)
 
 ### 2. Git Commit History
 
@@ -101,6 +103,40 @@ Identify potential skills based on:
 | Complexity | 20% | Multi-step, non-trivial implementation |
 | Documentation | 15% | Well-explained in history |
 | Specificity | 10% | Project-specific value |
+
+### Step 4.5: Extract Anti-patterns (Negative Learning)
+
+Identify patterns the user has explicitly rejected or corrected. This unique feature learns "what NOT to do" from your correction history.
+
+**Detection Signals**:
+
+| Signal Type | Examples | Weight |
+|-------------|----------|--------|
+| Direct rejection | "No", "Don't", "Never use", "That's wrong" | High |
+| Correction | "Actually...", "Instead of X, use Y", "Not like that" | High |
+| Deprecation | "That's outdated", "We don't use X anymore" | Medium |
+| Convention violation | "We always use X for this", "Follow our pattern" | Medium |
+| Re-request | Same question asked again after assistant response | Low |
+
+**Anti-pattern Structure**:
+
+| Field | Description |
+|-------|-------------|
+| trigger | What caused the wrong response |
+| wrong_approach | What was rejected |
+| correct_approach | What should be done instead |
+| reason | Why (if stated) |
+| severity | critical / warning / info |
+
+**Severity Classification**:
+
+| Confidence | Frequency | Severity |
+|------------|-----------|----------|
+| > 80% | 3+ | Critical (must avoid) |
+| > 60% | 2+ | Warning (discouraged) |
+| > 40% | 1+ | Info (consider avoiding) |
+
+For detailed detection algorithms, see [references/anti-pattern-detection.md](references/anti-pattern-detection.md).
 
 ### Step 5: Classify Patterns
 
@@ -182,6 +218,21 @@ Display candidates in three categories:
 
 4. [new-deploy-process] ~ [deployment-workflow] (70% similar)
    Options: Merge / Create separate / Skip
+
+## Detected Constraints (Negative Learning)
+
+5. **[constraint-express-router]** (Confidence: 90%)
+   - Severity: Critical
+   - Rejected: Express.js router
+   - Use instead: Hono framework
+   - Found in: 3 sessions
+   - Action: Add to [api-endpoint] skill constraints
+
+6. **[constraint-var-keyword]** (Confidence: 75%)
+   - Severity: Warning
+   - Rejected: `var` keyword
+   - Use instead: `const` or `let`
+   - Found in: 2 sessions
 ```
 
 ### Step 8: Generate and Validate Skills
@@ -256,6 +307,22 @@ description: [Extracted description with trigger phrases from patterns]
 
 - [Practice observed in history]
 - [Practice observed in history]
+
+## Constraints (Auto-generated from negative learning)
+
+The following patterns have been explicitly rejected in this project:
+
+### Critical (Must avoid)
+
+| Pattern | Instead Use | Reason |
+|---------|-------------|--------|
+| [Rejected pattern] | [Alternative] | [Why] |
+
+### Warnings
+
+| Pattern | Preferred | Reason |
+|---------|-----------|--------|
+| [Discouraged pattern] | [Better approach] | [Why] |
 
 ## Source References
 

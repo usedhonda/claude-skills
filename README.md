@@ -5,6 +5,29 @@
 
 A collection of Claude Code skills for enhanced development workflows.
 
+## Why This Tool?
+
+Unlike generic rule generators that only analyze your current codebase, **skill-from-history learns from YOUR actual development process**:
+
+- **Your conversations** - What you repeatedly ask Claude to do
+- **Your corrections** - Mistakes Claude made that you fixed
+- **Your codebase** - Project-specific conventions
+
+### Negative Learning (Unique Feature)
+
+Most tools learn "what to do". skill-from-history also learns **"what NOT to do"**:
+
+```
+User: "No, don't use Express. We use Hono now."
+         ↓
+   [Detected as anti-pattern]
+         ↓
+   Constraint added to skills:
+   "When creating API endpoints, use Hono framework (not Express)"
+```
+
+This prevents Claude from repeating the same mistakes across sessions.
+
 ## Features
 
 ### skill-from-history
@@ -88,6 +111,29 @@ MIT License - see [LICENSE](LICENSE)
 [![Claude Code](https://img.shields.io/badge/Claude%20Code-Skill-blue)](https://claude.ai/claude-code)
 
 Claude Code用スキルコレクション
+
+### なぜこのツール？
+
+一般的なルール生成ツールは「現在のコード」しか見ません。**skill-from-historyは「あなたの開発プロセス」から学習します**：
+
+- **会話履歴** - Claudeに繰り返し依頼していること
+- **修正履歴** - Claudeの間違いをあなたが直した記録
+- **コードベース** - プロジェクト固有の規約
+
+### 負の学習（独自機能）
+
+多くのツールは「何をすべきか」を学びます。skill-from-historyは**「何をすべきでないか」**も学習します：
+
+```
+ユーザー: 「違う、Expressは使わないで。今はHonoを使ってる」
+              ↓
+        [アンチパターンとして検出]
+              ↓
+        スキルに制約を追加:
+        「APIエンドポイント作成時はHonoを使用（Expressは禁止）」
+```
+
+これにより、セッションをまたいで同じ失敗を繰り返すことを防ぎます。
 
 ### 特徴
 

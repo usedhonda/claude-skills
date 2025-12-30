@@ -47,6 +47,56 @@ The following sections must exist in SKILL.md:
 | `## Implementation Steps` | Step-by-step guide |
 | `## Best Practices` | Usage guidelines |
 | `## Troubleshooting` | Common issues |
+| `## Constraints` | Auto-generated from negative learning |
+
+## Constraints Section Validation
+
+When a Constraints section is present (auto-generated from negative learning):
+
+### Structure Requirements
+
+| Element | Requirement |
+|---------|-------------|
+| Subsections | At least one of: Critical, Warnings, Info |
+| Table format | Pattern, Instead Use/Preferred, Reason columns |
+| Severity order | Critical > Warnings > Info |
+
+### Content Validation
+
+| Check | Requirement |
+|-------|-------------|
+| Pattern field | Non-empty, describes what to avoid |
+| Alternative field | Non-empty for Critical/Warnings |
+| Reason field | Recommended but optional |
+
+### Example Valid Constraints
+
+```markdown
+## Constraints (Auto-generated from negative learning)
+
+### Critical (Must avoid)
+
+| Pattern | Instead Use | Reason |
+|---------|-------------|--------|
+| Express.js router | Hono framework | Project standard |
+| `var` keyword | `const`/`let` | ES6+ requirement |
+
+### Warnings
+
+| Pattern | Preferred | Reason |
+|---------|-----------|--------|
+| Inline styles | CSS modules | Maintainability |
+```
+
+### Validation Output for Constraints
+
+```
+Constraints Section:
+✓ Structure: valid (2 subsections)
+✓ Critical: 2 patterns defined
+✓ Warnings: 1 pattern defined
+ℹ Info: not present (optional)
+```
 
 ## Word Count
 

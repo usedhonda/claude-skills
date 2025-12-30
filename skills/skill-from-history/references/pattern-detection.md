@@ -345,3 +345,78 @@ Set limits:
 - Max 100 sessions analyzed
 - Max 500 commits scanned
 - 30 second timeout per source
+
+## Anti-pattern Detection (Negative Learning)
+
+In addition to positive patterns, detect patterns that users have explicitly rejected.
+
+### Rejection Pattern Extraction
+
+Look for user messages following assistant responses:
+
+**Rejection Indicators**:
+- Starts with: "No", "Don't", "Wrong", "Actually", "Not"
+- Contains: "instead", "rather", "should be", "we use"
+- Sentiment: Negative following assistant code/suggestion
+
+**Extraction Logic**:
+
+```
+for each (assistant_msg, user_response) pair:
+  if is_rejection(user_response):
+    extract_anti_pattern(
+      context=assistant_msg,
+      rejection=user_response,
+      correction=find_correction(user_response)
+    )
+```
+
+### Rejection Signal Score
+
+| Signal | Score |
+|--------|-------|
+| Explicit "don't"/"never" | 1.0 |
+| Correction with alternative | 0.9 |
+| Preference statement | 0.7 |
+| Re-request after response | 0.6 |
+| Negative sentiment only | 0.4 |
+
+### Anti-pattern Confidence
+
+```
+confidence = (
+  rejection_signal * 0.40 +
+  frequency * 0.30 +
+  recency * 0.20 +
+  explicitness * 0.10
+)
+```
+
+### Severity Classification
+
+| Confidence | Frequency | Severity |
+|------------|-----------|----------|
+| > 80% | 3+ | Critical |
+| > 60% | 2+ | Warning |
+| > 40% | 1+ | Info |
+
+### Anti-pattern Output Structure
+
+```json
+{
+  "type": "anti_pattern",
+  "severity": "critical|warning|info",
+  "confidence": 85,
+  "pattern": {
+    "trigger": "When doing X",
+    "wrong": "Don't use Y",
+    "correct": "Use Z instead",
+    "reason": "Because..."
+  },
+  "sources": [
+    {"session": "abc123", "excerpt": "..."}
+  ]
+}
+```
+
+For detailed anti-pattern detection algorithms, see [anti-pattern-detection.md](anti-pattern-detection.md)
