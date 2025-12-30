@@ -1,0 +1,12 @@
+{
+  "name": "skill-from-history",
+  "version": "1.1.0",
+  "description": "A meta-skill that analyzes Claude Code conversation history, git commits, and codebase to generate project-specific skills",
+  "skills": [
+    {
+      "name": "skill-from-history",
+      "path": "."
+    }
+  ],
+  "repository": "https://github.com/usedhonda/skill-from-history"
+}

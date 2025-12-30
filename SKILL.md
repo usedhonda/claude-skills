@@ -104,28 +104,56 @@ Identify potential skills based on:
 
 ### Step 5: Classify Patterns
 
-Categorize each pattern as:
+Categorize each pattern into one of four categories:
 
-**Coding Patterns**:
+**Development & Technical**:
 - Error handling approaches
 - API design conventions
 - State management patterns
 - Data validation methods
 - Testing strategies
 
-**Workflow Patterns**:
+**Workflow & Process**:
 - Deployment procedures
 - Code review processes
 - Testing workflows
 - Build and release processes
 
-### Step 6: Compare with Existing Skills
+**Creative & Design**:
+- UI component patterns
+- Styling conventions
+- Animation patterns
+- Layout templates
 
-For each candidate, check similarity with existing skills:
+**Document & Data**:
+- Documentation templates
+- Data transformation patterns
+- Report generation
+- Configuration management
 
+### Step 6: Conflict Detection
+
+For each candidate, perform comprehensive conflict analysis:
+
+**Similarity Check**:
 - **Name similarity**: Levenshtein distance on skill names
 - **Keyword overlap**: Common terms in descriptions
 - **Pattern overlap**: Similar code structures
+
+**Conflict Types**:
+
+| Type | Severity | Description |
+|------|----------|-------------|
+| Duplicate | High | 80%+ similarity with existing skill |
+| Overlap | Medium | 50-80% similarity, partial coverage |
+| Missing Dependency | Medium | Pattern requires another skill |
+| Outdated Reference | Low | References deprecated code/APIs |
+
+**Resolution Options**:
+- **Merge**: Combine with existing skill
+- **Extend**: Add as variation to existing skill
+- **Replace**: Supersede outdated skill
+- **Skip**: Do not generate
 
 ### Step 7: Present Proposals
 
@@ -156,7 +184,7 @@ Display candidates in three categories:
    Options: Merge / Create separate / Skip
 ```
 
-### Step 8: Generate or Update Skills
+### Step 8: Generate and Validate Skills
 
 Based on user selection:
 
@@ -172,6 +200,18 @@ Based on user selection:
 - Append patterns to `references/`
 - Update relevant sections in SKILL.md
 - Increment version if present
+
+**Validation**: After generation, verify:
+
+| Check | Requirement | Auto-fix |
+|-------|-------------|----------|
+| name | max 64 chars, lowercase, hyphens only | Truncate/convert |
+| description | max 1024 chars, includes trigger phrases | Warn if missing |
+| YAML frontmatter | Valid syntax | Error |
+| Required sections | When to Use, Core Pattern | Warn |
+| Word count | 1,500-2,000 words recommended | Info |
+
+For detailed validation rules, see [references/validation.md](references/validation.md).
 
 ## Skill Generation Template
 
