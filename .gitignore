@@ -6,6 +6,9 @@ firebase-debug.log
 .claude/settings.local.json
 .claude/plans/
 
+# AI conversation logs (private)
+docs/
+
 # OS files
 .DS_Store
 Thumbs.db
