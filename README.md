@@ -4,8 +4,22 @@ A collection of Claude Code skills for enhanced development workflows.
 
 ## Installation
 
+### Via Plugin (Recommended)
+
 ```bash
 /plugin install skill-from-history@usedhonda/claude-skills
+```
+
+### Manual Installation
+
+```bash
+# Global
+mkdir -p ~/.claude/skills/skill-from-history
+cp -r skills/skill-from-history/* ~/.claude/skills/skill-from-history/
+
+# Project-specific
+mkdir -p .claude/skills/skill-from-history
+cp -r skills/skill-from-history/* .claude/skills/skill-from-history/
 ```
 
 ## Available Skills
@@ -44,7 +58,12 @@ MIT License - see [LICENSE](LICENSE)
 ### インストール
 
 ```bash
+# プラグイン経由（推奨）
 /plugin install skill-from-history@usedhonda/claude-skills
+
+# 手動インストール
+mkdir -p ~/.claude/skills/skill-from-history
+cp -r skills/skill-from-history/* ~/.claude/skills/skill-from-history/
 ```
 
 ### 収録スキル
