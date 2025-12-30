@@ -3,15 +3,24 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Claude Code](https://img.shields.io/badge/Claude%20Code-Skill-blue)](https://claude.ai/claude-code)
 
-A collection of Claude Code skills for enhanced development workflows.
+> **Project-Specific Skill Generator for Claude Code**
+>
+> Learn from YOUR project's history, not generic best practices.
 
-## Why This Tool?
+## Why Project-Specific?
 
-Unlike generic rule generators that only analyze your current codebase, **skill-from-history learns from YOUR actual development process**:
+| Generic Tools | skill-from-history |
+|---------------|-------------------|
+| Analyze current code only | Analyze **YOUR** conversations + commits + code |
+| Generic best practices | **YOUR** team's actual conventions |
+| One-size-fits-all rules | Tailored to **YOUR** project |
+| Learn "what to do" | Learn "what to do" + **"what NOT to do"** |
 
-- **Your conversations** - What you repeatedly ask Claude to do
-- **Your corrections** - Mistakes Claude made that you fixed
-- **Your codebase** - Project-specific conventions
+### What Makes It Project-Specific?
+
+- **Your conversations** - Patterns from what you repeatedly ask Claude
+- **Your corrections** - Mistakes Claude made that YOU fixed
+- **Your codebase** - Conventions unique to YOUR project
 
 ### Negative Learning (Unique Feature)
 
@@ -110,15 +119,24 @@ MIT License - see [LICENSE](LICENSE)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Claude Code](https://img.shields.io/badge/Claude%20Code-Skill-blue)](https://claude.ai/claude-code)
 
-Claude Code用スキルコレクション
+> **プロジェクト特化型スキル生成ツール for Claude Code**
+>
+> 汎用的なベストプラクティスではなく、あなたのプロジェクトの履歴から学習
 
-### なぜこのツール？
+### なぜ「プロジェクト特化」？
 
-一般的なルール生成ツールは「現在のコード」しか見ません。**skill-from-historyは「あなたの開発プロセス」から学習します**：
+| 一般的なツール | skill-from-history |
+|--------------|-------------------|
+| 現在のコードのみ分析 | **あなたの**会話 + コミット + コードを分析 |
+| 汎用的なベストプラクティス | **あなたのチーム**の実際の規約 |
+| 画一的なルール | **あなたのプロジェクト**に最適化 |
+| 「すべきこと」を学習 | 「すべきこと」+ **「すべきでないこと」**を学習 |
 
-- **会話履歴** - Claudeに繰り返し依頼していること
-- **修正履歴** - Claudeの間違いをあなたが直した記録
-- **コードベース** - プロジェクト固有の規約
+### プロジェクト特化の理由
+
+- **会話履歴** - Claudeに繰り返し依頼しているパターン
+- **修正履歴** - Claudeの間違いを**あなたが**直した記録
+- **コードベース** - **あなたのプロジェクト**固有の規約
 
 ### 負の学習（独自機能）
 
