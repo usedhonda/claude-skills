@@ -1,0 +1,20 @@
+{
+  "name": "usedhonda-claude-skills",
+  "owner": {
+    "name": "usedhonda"
+  },
+  "metadata": {
+    "description": "A collection of Claude Code skills for enhanced development workflows",
+    "version": "1.2.0"
+  },
+  "plugins": [
+    {
+      "name": "skill-from-history",
+      "description": "Analyzes Claude Code conversation history, git commits, and codebase to generate project-specific skills",
+      "source": "./",
+      "skills": [
+        "./skills/skill-from-history"
+      ]
+    }
+  ]
+}
