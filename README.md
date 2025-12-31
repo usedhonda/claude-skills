@@ -3,50 +3,83 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Claude Code](https://img.shields.io/badge/Claude%20Code-Skill-blue)](https://claude.ai/claude-code)
 
-> A collection of Claude Code skills for enhanced development workflows
+## Manifesto
+
+A project is a living argument with itself.
+
+Every "don't do that" and every "we chose this" is part of its culture—usually lost, repeated, and paid for again.
+
+**claude-skills** externalizes that memory: not as static doctrine, but as evidence-backed, reviewable guidance that can evolve, decay, and be forgotten.
+
+In the agent era, collaboration isn't just about writing code—it's about making decisions reproducible.
+
+## Principles
+
+| Principle | Description |
+|-----------|-------------|
+| **Project Learning** | Learn from YOUR history, not generic best practices |
+| **Negative Learning** | Learn what NOT to do from corrections |
+| **Evidence-first** | Every pattern links to its source `[E1][E2]` |
+| **Context Engineering** | Optimize for attention, not just tokens |
+| **Rules have half-life** | Learning includes forgetting |
+
+## How It Learns
+
+```
+Conversations + Commits + Code
+         ↓
+    Pattern Extraction
+         ↓
+    Evidence Linking
+         ↓
+    Human Review Gate
+         ↓
+    Skill Generation
+         ↓
+    Decay & Archival
+```
+
+## Use Cases
+
+### "I keep making the same correction"
+
+> "No, don't use Express. We use Hono now."
+
+Your correction becomes a constraint. Next time, the AI already knows.
+
+### "New members don't know our conventions"
+
+Tribal knowledge evaporates. claude-skills extracts it from actual behavior—with receipts.
+
+### "The AI forgot what we discussed"
+
+Long contexts lose focus in the middle. We anchor critical decisions at the edges.
+
+## Compared to
+
+| Tool | Approach | claude-skills |
+|------|----------|---------------|
+| **Cursor Rules** | Declare rules (human writes) | Observe patterns (history extracts) |
+| **Devin Knowledge** | Store knowledge | Make knowledge executable |
+| **Generic linters** | Enforce universal rules | Enforce YOUR conventions |
 
 ## Available Skills
 
 ### [skill-from-history](skills/skill-from-history/SKILL.md)
 
-> **Project-Specific Skill Generator** - Learn from YOUR project's history, not generic best practices.
+> **Project-Specific Skill Generator** - The meta-skill that powers this philosophy.
 
-#### Why Project-Specific?
+**Key Features:**
+- Multi-source analysis (conversations, Git, codebase)
+- Negative Learning (anti-pattern detection from corrections)
+- Evidence linking with `[E1][E2]` references
+- Review Gate for Critical constraints
+- Conflict detection and resolution
+- Command generation for frequently-used skills
 
-| Generic Tools | skill-from-history |
-|---------------|-------------------|
-| Analyze current code only | Analyze **YOUR** conversations + commits + code |
-| Generic best practices | **YOUR** team's actual conventions |
-| One-size-fits-all rules | Tailored to **YOUR** project |
-| Learn "what to do" | Learn "what to do" + **"what NOT to do"** |
-
-#### Key Features
-
-- **Multi-source analysis**: Conversation history, Git commits, and codebase
-- **Negative Learning**: Detects corrections you made to prevent repeated mistakes
-- **Evidence Linking**: Every pattern links to its source evidence `[E1][E2]`
-- **Review Gate**: Human approval required before Critical constraints
-- **Skill Lint**: Auto-validate generated skills for quality
-- **4 pattern categories**: Development, Workflow, Creative, Document
-- **Conflict detection**: Prevents duplicate skills
-
-#### Negative Learning (Unique)
-
-Most tools learn "what to do". This skill also learns **"what NOT to do"**:
-
-```
-User: "No, don't use Express. We use Hono now."
-         ↓
-   [Detected as anti-pattern]
-         ↓
-   Constraint added to skills:
-   "When creating API endpoints, use Hono framework (not Express)"
-```
-
-#### Quick Start
-
+**Quick Start:**
 ```bash
-/skill-from-history
+/gen-skills
 ```
 
 Or say: "create skills from history", "analyze patterns"
@@ -59,7 +92,7 @@ Or say: "create skills from history", "analyze patterns"
 # Add marketplace
 /plugin marketplace add usedhonda/claude-skills
 
-# Install specific skill
+# Install
 /plugin install skill-from-history@usedhonda-claude-skills
 ```
 
@@ -82,11 +115,7 @@ cp -r skills/skill-from-history/* .claude/skills/skill-from-history/
 
 ## Contributing
 
-Issues and PRs are welcome! To add a new skill:
-
-1. Create `skills/[skill-name]/SKILL.md`
-2. Add `references/` directory if needed
-3. Update this README
+Issues and PRs are welcome! See [ROADMAP](docs/ROADMAP.md) for planned features.
 
 ## License
 
@@ -94,55 +123,85 @@ MIT License - see [LICENSE](LICENSE)
 
 ---
 
-## 日本語
+# 日本語
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Claude Code](https://img.shields.io/badge/Claude%20Code-Skill-blue)](https://claude.ai/claude-code)
+## マニフェスト
 
-> Claude Code用スキルコレクション
+プロジェクトは、自分自身との対話である。
+
+「それはやるな」「こっちを選んだ」—その一つ一つがプロジェクトの文化だ。しかし多くは失われ、繰り返され、また代償を払うことになる。
+
+**claude-skills** はその記憶を外部化する。静的な教義としてではなく、証拠に裏付けられ、レビュー可能で、進化し、衰退し、忘れられることもできる知識として。
+
+エージェント時代の協働とは、コードを書くことではない。意思決定を再現可能にすることだ。
+
+## 原則
+
+| 原則 | 説明 |
+|------|------|
+| **プロジェクト学習** | 汎用ベストプラクティスではなく、あなたの履歴から学ぶ |
+| **負の学習** | 修正履歴から「すべきでないこと」も学ぶ |
+| **証拠優先** | すべてのパターンにソースを紐付け `[E1][E2]` |
+| **コンテキスト工学** | トークン量ではなく、注意の最適化 |
+| **ルールには賞味期限がある** | 学習には忘却が含まれる |
+
+## 学習の仕組み
+
+```
+会話 + コミット + コード
+         ↓
+    パターン抽出
+         ↓
+    証拠リンク
+         ↓
+    人間によるレビュー
+         ↓
+    スキル生成
+         ↓
+    衰退とアーカイブ
+```
+
+## ユースケース
+
+### 「また同じ指摘をしている」
+
+> 「違う、Expressは使わない。今はHonoを使ってる」
+
+あなたの修正が制約になる。次からAIは最初から知っている。
+
+### 「新メンバーが規約を知らない」
+
+暗黙知は蒸発する。claude-skillsは実際の行動から抽出する—証拠付きで。
+
+### 「AIが話した内容を忘れた」
+
+長いコンテキストは中央部で集中力を失う。重要な決定を端にアンカーする。
+
+## 他ツールとの比較
+
+| ツール | アプローチ | claude-skills |
+|--------|----------|---------------|
+| **Cursor Rules** | ルールを宣言（人間が書く） | パターンを観測（履歴から抽出） |
+| **Devin Knowledge** | 知識を保管 | 知識を実行可能に |
+| **汎用リンター** | 普遍的ルールを適用 | あなたの規約を適用 |
 
 ## 利用可能なスキル
 
 ### [skill-from-history](skills/skill-from-history/SKILL.md)
 
-> **プロジェクト特化型スキル生成** - 汎用的なベストプラクティスではなく、あなたのプロジェクトの履歴から学習
+> **プロジェクト特化型スキル生成** - この思想を実現するメタスキル。
 
-#### なぜ「プロジェクト特化」？
+**主な機能:**
+- マルチソース分析（会話、Git、コードベース）
+- 負の学習（修正履歴からのアンチパターン検出）
+- 証拠リンク `[E1][E2]`
+- Critical制約のレビューゲート
+- 衝突検出と解決
+- 頻用スキルのコマンド生成
 
-| 一般的なツール | skill-from-history |
-|--------------|-------------------|
-| 現在のコードのみ分析 | **あなたの**会話 + コミット + コードを分析 |
-| 汎用的なベストプラクティス | **あなたのチーム**の実際の規約 |
-| 画一的なルール | **あなたのプロジェクト**に最適化 |
-| 「すべきこと」を学習 | 「すべきこと」+ **「すべきでないこと」**を学習 |
-
-#### 主な機能
-
-- **マルチソース分析**: 会話履歴、Git、コードベース
-- **負の学習**: 修正履歴から同じ失敗を防止
-- **エビデンスリンク**: 各パターンをソースに紐付け `[E1][E2]`
-- **レビューゲート**: Critical制約には人間の承認が必要
-- **スキルLint**: 生成されたスキルの品質を自動検証
-- **4カテゴリ分類**: Development, Workflow, Creative, Document
-- **重複検出**: 既存スキルとの競合を防止
-
-#### 負の学習（独自機能）
-
-多くのツールは「何をすべきか」を学びます。このスキルは**「何をすべきでないか」**も学習：
-
-```
-ユーザー: 「違う、Expressは使わないで。今はHonoを使ってる」
-              ↓
-        [アンチパターンとして検出]
-              ↓
-        スキルに制約を追加:
-        「APIエンドポイント作成時はHonoを使用（Expressは禁止）」
-```
-
-#### クイックスタート
-
+**クイックスタート:**
 ```bash
-/skill-from-history
+/gen-skills
 ```
 
 または「履歴からスキル作成」「パターン分析」と入力
@@ -155,7 +214,7 @@ MIT License - see [LICENSE](LICENSE)
 # マーケットプレイス追加
 /plugin marketplace add usedhonda/claude-skills
 
-# スキルをインストール
+# インストール
 /plugin install skill-from-history@usedhonda-claude-skills
 ```
 
@@ -178,8 +237,4 @@ cp -r skills/skill-from-history/* .claude/skills/skill-from-history/
 
 ## コントリビュート
 
-Issue・PR歓迎！新しいスキルを追加するには:
-
-1. `skills/[skill-name]/SKILL.md` を作成
-2. 必要に応じて `references/` ディレクトリを追加
-3. このREADMEを更新
+Issue・PR歓迎！計画中の機能は [ROADMAP](docs/ROADMAP.md) を参照。
