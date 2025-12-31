@@ -78,11 +78,13 @@ Auto-generated table of contents:
 | 0003 | Prefer date-fns over dayjs | 2024-12-20 | Accepted |
 ```
 
-## Generation Workflow
+## Generation Workflow (Human-in-the-Loop)
 
-### Step 1: Detect High-Confidence Pattern
+ADR generation uses a 3-stage approval process to prevent accidental formalization of anti-patterns.
 
-During pattern extraction, check thresholds:
+### Stage 1: Proposal (Automatic)
+
+When a pattern meets thresholds, propose (do NOT auto-generate):
 
 ```python
 def should_propose_adr(pattern):
@@ -93,7 +95,91 @@ def should_propose_adr(pattern):
     )
 ```
 
-### Step 2: Extract ADR Content
+**Proposal prompt**:
+```
+Pattern "hono-framework" detected:
+- Confidence: 92%
+- Evidence: 6 sources
+- Frequency: 8 occurrences
+
+This pattern appears frequently. Formalize as ADR?
+[yes] Create draft  [no] Skip  [customize] Edit first
+```
+
+**Important**: No file is created at this stage. This prevents "sunk cost" hallucination where repeated mistakes become formalized standards.
+
+### Stage 2: Draft (After First Approval)
+
+On `yes` or `customize`, create Draft ADR:
+
+```markdown
+# ADR-0004: Use Hono Framework [DRAFT]
+
+**Date**: 2024-12-20
+**Status**: Draft
+**Confidence**: 92%
+
+## Context
+[Auto-extracted from pattern]
+
+## Decision
+[Auto-extracted from pattern]
+
+## Evidence
+[Auto-linked from pattern evidence]
+```
+
+**Draft properties**:
+- Status: `Draft` (not `Accepted`)
+- Editable by user
+- NOT enforced in skill-for-review
+- Stored in `docs/adr/drafts/` until accepted
+
+**Review prompt**:
+```
+Draft ADR created: docs/adr/drafts/0004-use-hono-framework.md
+
+Review and edit if needed, then:
+[accept] Finalize as project standard
+[edit] Continue editing
+[reject] Discard draft
+```
+
+### Stage 3: Accept (Final Approval)
+
+On `accept`:
+
+1. Move from `drafts/` to `docs/adr/`
+2. Update status: `Draft` → `Accepted`
+3. Remove `[DRAFT]` from title
+4. Update `index.md`
+5. Link in skill's Evidence Index
+
+**Final confirmation**:
+```
+ADR-0004 "Use Hono Framework" accepted as project standard.
+Location: docs/adr/0004-use-hono-framework.md
+
+This decision will now be enforced in skill-for-review.
+```
+
+### Rejection Handling
+
+On `reject` at any stage:
+- Draft is deleted (if created)
+- Pattern is marked `adr_rejected: true`
+- Pattern will not trigger ADR proposal again (unless threshold increases significantly)
+
+```json
+{
+  "pattern_id": "hono-framework",
+  "adr_rejected": true,
+  "rejected_at": "2024-12-20T15:00:00Z",
+  "rejection_reason": "Exploratory, not a team decision"
+}
+```
+
+### Content Extraction
 
 Map pattern fields to ADR sections:
 
@@ -104,31 +190,6 @@ Map pattern fields to ADR sections:
 | evidence[].excerpt | Evidence table |
 | constraints | Consequences (negative) |
 | benefits | Consequences (positive) |
-
-### Step 3: Present Proposal
-
-```markdown
-## ADR Proposal
-
-Pattern "hono-framework" meets ADR threshold:
-- Confidence: 92%
-- Evidence: 6 sources
-- Frequency: 8 occurrences
-
-**Proposed ADR**:
-- Title: Use Hono Framework for API Development
-- Location: docs/adr/0004-use-hono-framework.md
-
-Generate ADR? (yes/no/customize)
-```
-
-### Step 4: Generate or Customize
-
-On approval:
-1. Determine next ADR number
-2. Generate ADR file
-3. Update index.md
-4. Link ADR in skill's Evidence Index
 
 ## Linking ADRs to Skills
 

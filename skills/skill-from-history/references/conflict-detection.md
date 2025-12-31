@@ -253,3 +253,86 @@ On supersession resolution:
 | subject_similarity_threshold | 0.8 | Minimum for conflict detection |
 | context_overlap_threshold | 0.6 | Minimum for scope conflict |
 | max_conflicts_per_batch | 10 | Stop after finding N conflicts |
+
+## Temporal Weighting
+
+Automatic resolution preference based on evidence recency.
+
+### Default Behavior
+
+When conflicts are detected, newer evidence is preferred by default:
+
+| Scenario | Resolution |
+|----------|------------|
+| Same confidence | Prefer newer evidence |
+| Confidence differs by >10% | Prefer higher confidence |
+| Both similar | Prompt user for decision |
+
+### Recency Weight Calculation
+
+Evidence weight decreases with age:
+
+```
+recency_weight = 1.0 - (days_old / 365) * 0.5
+```
+
+| Age | Weight |
+|-----|--------|
+| Today | 1.0 |
+| 3 months | 0.875 |
+| 6 months | 0.75 |
+| 1 year | 0.5 |
+
+### Evidence Timestamp Format
+
+```json
+{
+  "evidence": [
+    {
+      "id": "E1",
+      "timestamp": "2024-10-15",
+      "raw_confidence": 0.85,
+      "recency_weight": 0.7,
+      "weighted_confidence": 0.595
+    },
+    {
+      "id": "E2",
+      "timestamp": "2024-12-20",
+      "raw_confidence": 0.80,
+      "recency_weight": 1.0,
+      "weighted_confidence": 0.80
+    }
+  ]
+}
+```
+
+### Weighted Conflict Resolution
+
+```python
+def resolve_temporal_conflict(existing, new):
+    existing_score = existing.confidence * existing.recency_weight
+    new_score = new.confidence * new.recency_weight
+
+    diff = abs(existing_score - new_score)
+
+    if diff < 0.1:  # Within 10%
+        return "prompt_user"
+    elif new_score > existing_score:
+        return "supersede"
+    else:
+        return "keep_old"
+```
+
+### Override Options
+
+Users can explicitly override temporal weighting:
+
+```bash
+# Force keep old rule despite newer evidence
+resolution: "keep-old" --reason "Legacy compatibility required"
+
+# Force supersede despite lower confidence
+resolution: "supersede" --reason "Team decision to migrate"
+```
+
+Override reasons are recorded in conflict resolution log.

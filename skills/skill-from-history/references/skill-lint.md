@@ -303,3 +303,83 @@ In `.claude/settings.local.json`:
   }
 }
 ```
+
+## Context-Aware Severity
+
+Rule severity adjusts based on execution context to reduce friction during development.
+
+### Context Detection
+
+```bash
+# CI detection
+if [ -n "$CI" ] || [ -n "$GITHUB_ACTIONS" ] || [ -n "$GITLAB_CI" ]; then
+  CONTEXT="ci"
+else
+  CONTEXT="local"
+fi
+```
+
+### Severity Matrix
+
+| Rule | Local | CI | Rationale |
+|------|-------|-----|-----------|
+| CONS-005 | Warning | Error | Allow refactoring locally |
+| CONS-006 | Warning | Warning | Supersession links helpful but not blocking |
+| GLOS-001 | Info | Info | Glossary is advisory |
+| ADR-001 | Info | Info | ADR recommendation is advisory |
+
+### Configuration Override
+
+Override default context severity in `.claude/settings.local.json`:
+
+```json
+{
+  "skill-lint": {
+    "context-severity": {
+      "local": {
+        "CONS-005": "warning",
+        "CONS-006": "info"
+      },
+      "ci": {
+        "CONS-005": "error",
+        "CONS-006": "warning"
+      }
+    }
+  }
+}
+```
+
+### Escape Hatch
+
+Allow specific violations with documented reason:
+
+```bash
+skill-lint --allow CONS-005 --reason "Refactoring in progress"
+```
+
+**Logged output**:
+```
+CONS-005 allowed: "Refactoring in progress"
+Logged to: .claude/lint-exceptions.log
+```
+
+Exception log format:
+```json
+{
+  "rule": "CONS-005",
+  "allowed_at": "2024-12-20T15:00:00Z",
+  "reason": "Refactoring in progress",
+  "user": "developer",
+  "context": "local"
+}
+```
+
+### Force Strict Mode
+
+Override context detection for strict CI-like behavior locally:
+
+```bash
+skill-lint --strict <path-to-SKILL.md>
+```
+
+This applies CI-level severity regardless of detected context.

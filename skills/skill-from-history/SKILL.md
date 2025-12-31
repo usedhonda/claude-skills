@@ -277,21 +277,21 @@ For extraction patterns and format specification, see [references/glossary.md](r
 
 ## ADR Generation
 
-High-confidence patterns automatically trigger Architecture Decision Record (ADR) proposals.
+High-confidence patterns trigger Architecture Decision Record (ADR) proposals via a 3-stage Human-in-the-Loop workflow.
 
 **Trigger Thresholds** (any one):
 - Confidence >= 90%
 - Evidence count >= 5
 - Frequency >= 5
 
-**Output**: Lightweight ADRs in `docs/adr/` with:
-- Context (why), Decision (what), Consequences
-- Evidence table linking to source sessions/commits
-- Bidirectional links to generating skill
+**3-Stage Workflow**:
+1. **Proposal**: Pattern detected, user prompted (no file created)
+2. **Draft**: User approves → Draft ADR in `docs/adr/drafts/` (editable, not enforced)
+3. **Accept**: User finalizes → Moved to `docs/adr/`, enforced in review
 
-**Supersession**: When constraints are superseded, ADRs are automatically updated with status changes and links.
+**Why Human-in-the-Loop**: Prevents accidental formalization of anti-patterns or exploratory conversations as project standards.
 
-For ADR format and workflow, see [references/adr-lite.md](references/adr-lite.md).
+For ADR format and workflow details, see [references/adr-lite.md](references/adr-lite.md).
 
 ## Review Mode
 
