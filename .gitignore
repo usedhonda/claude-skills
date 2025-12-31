@@ -5,6 +5,7 @@ firebase-debug.log
 # Claude Code local settings
 .claude/settings.local.json
 .claude/plans/
+.claude/skills/
 
 # AI conversation logs (private)
 docs/
