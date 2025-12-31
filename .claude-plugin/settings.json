@@ -1,6 +1,6 @@
 {
   "name": "claude-skills",
-  "version": "1.4.1",
+  "version": "1.4.2",
   "description": "A collection of Claude Code skills for enhanced development workflows",
   "skills": [
     {
@@ -8,5 +8,6 @@
       "path": "skills/skill-from-history"
     }
   ],
+  "commands": ["./commands/"],
   "repository": "https://github.com/usedhonda/claude-skills"
 }
