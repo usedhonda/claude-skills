@@ -63,6 +63,8 @@ EVID-005:160 - Invalid commit hash: "xyz123"
 | CONS-002 | Each constraint must have non-empty "Instead Use" column | Warning | No |
 | CONS-003 | Pending Critical constraints must have approval status | Error | No |
 | CONS-004 | Constraint tables must have Evidence column | Warning | Add column |
+| CONS-005 | No unresolved semantic conflicts between constraints | Error | No |
+| CONS-006 | Superseded constraints must link to successor | Warning | No |
 
 **Examples**:
 
@@ -80,6 +82,13 @@ CONS-003:95 - Pending Critical constraint missing approval status
 CONS-004:88 - Constraint table missing Evidence column
               Expected columns: Pattern, Instead Use, Reason, Evidence
               Auto-fix: Add empty Evidence column
+
+CONS-005:1 - Unresolved semantic conflict detected
+             "Use dayjs" conflicts with "Use date-fns"
+             Resolution required: supersede/scope/keep-old/merge
+
+CONS-006:45 - Superseded constraint missing successor link
+              constraint-dayjs: status=superseded but no superseded_by field
 ```
 
 ### Structure Validation (STRU)
@@ -173,6 +182,32 @@ FILE-002:294 - Section "Skill Generation Template" is 90 lines
 
 FILE-003:1 - Reference file pattern-detection.md exceeds 300 lines (423)
              Consider splitting into multiple files
+```
+
+### Glossary Validation (GLOS)
+
+| Rule | Description | Severity | Auto-fix |
+|------|-------------|----------|----------|
+| GLOS-001 | Project-specific terms should be in glossary | Info | No |
+
+**Examples**:
+
+```
+GLOS-001:45 - Term "Handler" used but not in glossary
+             Consider adding to glossary with /glossary-add
+```
+
+### ADR Validation (ADR)
+
+| Rule | Description | Severity | Auto-fix |
+|------|-------------|----------|----------|
+| ADR-001 | High-confidence patterns (>=90%) should have ADR | Info | No |
+
+**Examples**:
+
+```
+ADR-001:1 - Pattern "hono-framework" (confidence: 92%) has no ADR
+           Consider generating: docs/adr/0004-use-hono-framework.md
 ```
 
 ## Execution

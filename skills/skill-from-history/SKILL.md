@@ -176,7 +176,7 @@ For each candidate, perform comprehensive conflict analysis:
 - **Keyword overlap**: Common terms in descriptions
 - **Pattern overlap**: Similar code structures
 
-**Conflict Types**:
+**Skill Conflict Types**:
 
 | Type | Severity | Description |
 |------|----------|-------------|
@@ -185,10 +185,21 @@ For each candidate, perform comprehensive conflict analysis:
 | Missing Dependency | Medium | Pattern requires another skill |
 | Outdated Reference | Low | References deprecated code/APIs |
 
+**Semantic Conflict Detection** (constraints):
+
+| Conflict Type | Detection | Resolution |
+|---------------|-----------|------------|
+| Direct contradiction | Same subject, opposite polarity | User chooses |
+| Temporal evolution | Newer supersedes older | `supersede` |
+| Scope overlap | Same context, different actions | Define scopes |
+
+Semantic conflicts require resolution before proceeding. For algorithm details, see [references/conflict-detection.md](references/conflict-detection.md).
+
 **Resolution Options**:
 - **Merge**: Combine with existing skill
 - **Extend**: Add as variation to existing skill
-- **Replace**: Supersede outdated skill
+- **Replace/Supersede**: Mark old as superseded, link to new
+- **Scope**: Both valid in different contexts
 - **Skip**: Do not generate
 
 ### Step 7: Present Proposals
@@ -248,6 +259,60 @@ Generated skills include:
 - Evidence Index with sessions, commits, and code patterns
 
 For complete template and examples, see [references/skill-template.md](references/skill-template.md).
+
+## Glossary Extraction
+
+During analysis, this skill automatically extracts project-specific terminology:
+
+**Detection Signals**:
+- Explicit definitions: "X means Y", "We call it X"
+- Parenthetical expansions: "Use DI (Dependency Injection)"
+- Corrections: "We call it Handler, not Controller"
+
+**Output**: Terms are stored in `.claude/glossary.md` or skill-specific `glossary.md`.
+
+**Integration**: Generated skills automatically include glossary notes for project-specific terms (e.g., "Handler (our term for Hono route controllers)").
+
+For extraction patterns and format specification, see [references/glossary.md](references/glossary.md).
+
+## ADR Generation
+
+High-confidence patterns automatically trigger Architecture Decision Record (ADR) proposals.
+
+**Trigger Thresholds** (any one):
+- Confidence >= 90%
+- Evidence count >= 5
+- Frequency >= 5
+
+**Output**: Lightweight ADRs in `docs/adr/` with:
+- Context (why), Decision (what), Consequences
+- Evidence table linking to source sessions/commits
+- Bidirectional links to generating skill
+
+**Supersession**: When constraints are superseded, ADRs are automatically updated with status changes and links.
+
+For ADR format and workflow, see [references/adr-lite.md](references/adr-lite.md).
+
+## Review Mode
+
+Check code changes against project constraints before commit or PR.
+
+**Trigger**: `/skill-for-review [--staged|--branch|--pr <number>]`
+
+**Workflow**:
+1. Get diff (staged, branch, or PR)
+2. Load constraints from all skills in `.claude/skills/`
+3. Match changed lines against constraint patterns
+4. Report violations by severity
+
+**Output**:
+- Critical violations: Must resolve (blocks commit in hook mode)
+- Warnings: Should resolve
+- Applicable constraints: Shows relevant constraints for changed files
+
+**Integration**: Can be used as pre-commit hook or CI step.
+
+For detailed workflow and integration options, see [references/review-mode.md](references/review-mode.md).
 
 ## Configuration
 
