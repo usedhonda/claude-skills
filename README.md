@@ -115,7 +115,7 @@ cp -r skills/skill-from-history/* .claude/skills/skill-from-history/
 
 ## Contributing
 
-Issues and PRs are welcome! See [ROADMAP](docs/ROADMAP.md) for planned features.
+Issues and PRs are welcome!
 
 ## License
 
@@ -237,4 +237,4 @@ cp -r skills/skill-from-history/* .claude/skills/skill-from-history/
 
 ## コントリビュート
 
-Issue・PR歓迎！計画中の機能は [ROADMAP](docs/ROADMAP.md) を参照。
+Issue・PR歓迎！
