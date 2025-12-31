@@ -58,8 +58,9 @@ When a Constraints section is present (auto-generated from negative learning):
 | Element | Requirement |
 |---------|-------------|
 | Subsections | At least one of: Critical, Warnings, Info |
-| Table format | Pattern, Instead Use/Preferred, Reason columns |
+| Table format | Pattern, Instead Use/Preferred, Reason, Evidence columns |
 | Severity order | Critical > Warnings > Info |
+| Evidence linking | Critical constraints require 2+ evidence sources |
 
 ### Content Validation
 
@@ -76,16 +77,16 @@ When a Constraints section is present (auto-generated from negative learning):
 
 ### Critical (Must avoid)
 
-| Pattern | Instead Use | Reason |
-|---------|-------------|--------|
-| Express.js router | Hono framework | Project standard |
-| `var` keyword | `const`/`let` | ES6+ requirement |
+| Pattern | Instead Use | Reason | Evidence |
+|---------|-------------|--------|----------|
+| Express.js router | Hono framework | Project standard | [E5][E6][E7] |
+| `var` keyword | `const`/`let` | ES6+ requirement | [E8][E9] |
 
 ### Warnings
 
-| Pattern | Preferred | Reason |
-|---------|-----------|--------|
-| Inline styles | CSS modules | Maintainability |
+| Pattern | Preferred | Reason | Evidence |
+|---------|-----------|--------|----------|
+| Inline styles | CSS modules | Maintainability | [E10] |
 ```
 
 ### Validation Output for Constraints
@@ -139,3 +140,14 @@ Status: PASS
 - Name formatting (lowercase, hyphens)
 - Whitespace normalization
 - Duplicate section removal
+
+## Extended Validation (Skill Lint)
+
+For comprehensive validation including link checking, evidence validation, and structure analysis, see [skill-lint.md](skill-lint.md).
+
+Skill Lint provides additional rules:
+- **LINK**: Verify all links and evidence references resolve
+- **EVID**: Validate Evidence Index completeness and format
+- **CONS**: Ensure constraints have proper evidence backing
+- **STRU**: Check markdown structure and hierarchy
+- **CONT**: Detect placeholder text and TODO markers

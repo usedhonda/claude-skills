@@ -290,6 +290,21 @@ To be proposed, a pattern must:
 
 ## Output Format
 
+### Evidence ID Generation
+
+Each source gets a unique evidence ID for traceability:
+
+```
+evidence_id = "E" + sequential_counter
+```
+
+IDs are assigned in order:
+1. Session evidence (chronological)
+2. Commit evidence (chronological)
+3. Code block evidence (file order)
+
+For full specification, see [evidence-format.md](evidence-format.md).
+
 ### Candidate Structure
 
 ```json
@@ -299,14 +314,35 @@ To be proposed, a pattern must:
   "confidence": 85,
   "frequency": 5,
   "sources": [
-    {"type": "session", "id": "abc123", "description": "..."},
-    {"type": "commit", "hash": "def456", "message": "..."}
+    {
+      "evidence_id": "E1",
+      "type": "session",
+      "id": "abc123",
+      "timestamp": "2024-12-15T10:30:00Z",
+      "excerpt": "Use Hono for API endpoints",
+      "description": "User stated framework preference"
+    },
+    {
+      "evidence_id": "E2",
+      "type": "commit",
+      "hash": "def456",
+      "timestamp": "2024-12-17T14:20:00Z",
+      "message": "refactor(api): migrate to Hono"
+    },
+    {
+      "evidence_id": "E3",
+      "type": "code",
+      "file": "src/api/router.ts",
+      "lines": "15-28",
+      "pattern": "Hono route handler template"
+    }
   ],
   "patterns": [
     {
       "description": "Main pattern description",
       "code": "code template if applicable",
-      "steps": ["step1", "step2"]
+      "steps": ["step1", "step2"],
+      "evidence_refs": ["E1", "E2"]
     }
   ],
   "similar_to": null | {

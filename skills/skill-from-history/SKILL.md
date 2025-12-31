@@ -202,11 +202,13 @@ Display candidates in three categories:
    Category: Coding Pattern
    Found in: 5 sessions, 12 commits
    Key pattern: Try-catch with custom error types
+   Evidence: [E1][E2][E3]
 
 2. [api-response-format] (Confidence: 78%)
    Category: Coding Pattern
    Found in: 8 sessions, 20 commits
    Key pattern: Consistent JSON response structure
+   Evidence: [E4][E5]
 
 ## Additions to Existing Skills
 
@@ -221,19 +223,44 @@ Display candidates in three categories:
 
 ## Detected Constraints (Negative Learning)
 
-5. **[constraint-express-router]** (Confidence: 90%)
-   - Severity: Critical
-   - Rejected: Express.js router
-   - Use instead: Hono framework
-   - Found in: 3 sessions
-   - Action: Add to [api-endpoint] skill constraints
-
-6. **[constraint-var-keyword]** (Confidence: 75%)
+5. **[constraint-var-keyword]** (Confidence: 75%)
    - Severity: Warning
    - Rejected: `var` keyword
    - Use instead: `const` or `let`
    - Found in: 2 sessions
+   - Evidence: [E6][E7]
 ```
+
+### Step 7.5: Review Gate for Critical Constraints
+
+When constraints meet Critical thresholds (confidence > 80%, frequency >= 3), they are marked as "Pending Critical" and require user approval before enforcement:
+
+```
+## Pending Critical Constraints (Requires Approval)
+
+The following anti-patterns meet Critical threshold but require your confirmation:
+
+### 1. [constraint-express-router]
+
+- **Detected Pattern**: Don't use Express.js router
+- **Use Instead**: Hono framework
+- **Confidence**: 90%
+- **Found in**: 3 sessions
+
+**Evidence**:
+- [E8] Session abc123: "No, we use Hono for all new endpoints"
+- [E9] Session def456: "Don't use Express, switch to Hono"
+- [E10] Session ghi789: "Express is deprecated in our codebase"
+
+**Action Required**:
+- `approve` - Confirm as Critical (blocks generation if violated)
+- `warning` - Demote to Warning (shows warning but allows)
+- `skip` - Remove this constraint
+
+Your choice: [approve/warning/skip]
+```
+
+For detailed Review Gate workflow, see [references/anti-pattern-detection.md](references/anti-pattern-detection.md#review-gate).
 
 ### Step 8: Generate and Validate Skills
 
@@ -266,7 +293,7 @@ For detailed validation rules, see [references/validation.md](references/validat
 
 ## Skill Generation Template
 
-Generated skills follow this structure:
+Generated skills follow this structure with evidence linking:
 
 ```yaml
 ---
@@ -276,16 +303,16 @@ description: [Extracted description with trigger phrases from patterns]
 
 # [Skill Title]
 
-[Brief introduction based on extracted patterns]
+[Brief introduction based on extracted patterns] [E1][E2]
 
 ## When to Use
 
-- [Trigger condition from history]
-- [Another trigger from patterns]
+- [Trigger condition from history] [E1]
+- [Another trigger from patterns] [E3]
 
 ## Core Pattern
 
-[Main code pattern extracted from history]
+[Main code pattern extracted from history] [E1][E4]
 
 ### Template
 
@@ -293,20 +320,22 @@ description: [Extracted description with trigger phrases from patterns]
 [Reusable template from extracted patterns]
 ```
 
+**Evidence**: Derived from [description] [E1], refined in [E4]
+
 ## Implementation Steps
 
-1. [Step derived from history]
-2. [Step derived from history]
+1. [Step derived from history] [E2]
+2. [Step derived from history] [E5]
 
 ## Variations
 
 ### [Variation Name]
-[Alternative approach found in history]
+[Alternative approach found in history] [E6]
 
 ## Best Practices
 
-- [Practice observed in history]
-- [Practice observed in history]
+- [Practice observed in history] [E3]
+- [Practice observed in history] [E7]
 
 ## Constraints (Auto-generated from negative learning)
 
@@ -314,21 +343,47 @@ The following patterns have been explicitly rejected in this project:
 
 ### Critical (Must avoid)
 
-| Pattern | Instead Use | Reason |
-|---------|-------------|--------|
-| [Rejected pattern] | [Alternative] | [Why] |
+| Pattern | Instead Use | Reason | Evidence |
+|---------|-------------|--------|----------|
+| [Rejected pattern] | [Alternative] | [Why] | [E8][E9] |
 
 ### Warnings
 
-| Pattern | Preferred | Reason |
-|---------|-----------|--------|
-| [Discouraged pattern] | [Better approach] | [Why] |
+| Pattern | Preferred | Reason | Evidence |
+|---------|-----------|--------|----------|
+| [Discouraged pattern] | [Better approach] | [Why] | [E10] |
 
-## Source References
+---
 
-- Session: [session-id] - [description]
-- Commit: [commit-hash] - [message]
+## Evidence Index
+
+Evidence supporting patterns and constraints in this skill.
+
+### Sessions
+
+| ID | Session | Date | Description |
+|----|---------|------|-------------|
+| E1 | `abc123` | 2024-12-15 | Initial pattern implementation |
+| E3 | `def456` | 2024-12-18 | Trigger condition discussion |
+| E8 | `ghi789` | 2024-12-20 | "Don't use X, we use Y instead" |
+
+### Commits
+
+| ID | Hash | Date | Message |
+|----|------|------|---------|
+| E2 | `a1b2c3d` | 2024-12-16 | feat: add pattern implementation |
+| E4 | `e4f5g6h` | 2024-12-17 | refactor: optimize pattern |
+| E5 | `i7j8k9l` | 2024-12-19 | docs: add step documentation |
+
+### Code Patterns
+
+| ID | File | Lines | Pattern |
+|----|------|-------|---------|
+| E6 | `src/example.ts` | 15-28 | Alternative approach template |
+| E7 | `src/utils.ts` | 42-55 | Best practice implementation |
 ```
+
+For evidence format specification, see [references/evidence-format.md](references/evidence-format.md).
 
 ## Example Session
 
@@ -344,19 +399,38 @@ Found: 45 conversation sessions, 230 commits, 156 source files
 ### New Skill Candidates
 
 1. **firebase-auth-flow** (Confidence: 92%)
+   - Category: Development & Technical
    - Found in: 12 sessions, 25 commits
    - Pattern: Firebase authentication with custom claims
    - Includes: Login, logout, token refresh, role checking
+   - Key Evidence:
+     - [E1] Session abc123: "Use Firebase custom claims for roles"
+     - [E2] Commit a1b2c3d: feat(auth): add custom claims handling
 
 2. **api-error-handling** (Confidence: 85%)
+   - Category: Development & Technical
    - Found in: 8 sessions, 18 commits
    - Pattern: Consistent error response format
-   - Includes: Error types, logging, client responses
+   - Key Evidence:
+     - [E3] Session def456: Error handling discussion
+     - [E4] Commit e4f5g6h: fix(api): standardize error format
+
+### Detected Constraints (Negative Learning)
+
+3. **[constraint-express-router]** (Confidence: 90%)
+   - Severity: Critical
+   - Rejected: Express.js router
+   - Use instead: Hono framework
+   - Evidence:
+     - [E5] Session ghi789: "No, we use Hono for all new endpoints"
+     - [E6] Session jkl012: "Don't use Express, switch to Hono"
+     - [E7] Session mno345: "Express is deprecated in our project"
 
 ### Existing Skill Updates
 
-3. **[existing: deployment-workflow]** + 2 new patterns
+4. **[existing: deployment-workflow]** + 2 new patterns
    - New: Canary deployment steps, rollback procedure
+   - Evidence: [E8] 3 sessions discussing deployment
    - Action needed: Merge or create separate
 
 Which skills would you like to generate? (e.g., "1, 2" or "all")
@@ -369,11 +443,10 @@ Created:
 - .claude/skills/firebase-auth-flow/SKILL.md (1,847 words)
 - .claude/skills/firebase-auth-flow/references/patterns.md
 
-The skill captures:
-- Authentication flow with Firebase
-- Custom claims management
-- Token refresh handling
-- Role-based access patterns
+The skill includes:
+- 8 evidence references (E1-E8)
+- Evidence Index with sessions, commits, and code patterns
+- 1 Critical constraint from negative learning
 
 You can now use this skill by mentioning "Firebase auth" or
 "authentication flow" in your prompts.

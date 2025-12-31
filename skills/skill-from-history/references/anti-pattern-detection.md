@@ -223,9 +223,11 @@ Where:
 
 | Confidence | Frequency | Severity | Action |
 |------------|-----------|----------|--------|
-| > 80% | 3+ | Critical | Must avoid, block generation |
+| > 80% | 3+ | Pending Critical | Requires user approval (see Review Gate) |
 | > 60% | 2+ | Warning | Warn user, suggest alternative |
 | > 40% | 1+ | Info | Include in documentation |
+
+**Note**: Critical severity is only assigned after user approval through the Review Gate process.
 
 ## Output Format
 
@@ -235,7 +237,8 @@ Where:
 {
   "id": "constraint-[hash]",
   "type": "forbidden|deprecated|convention|architecture|security",
-  "severity": "critical|warning|info",
+  "severity": "pending_critical|critical|warning|info",
+  "approval_status": "pending|approved|rejected",
   "confidence": 85,
   "frequency": 3,
   "pattern": {
@@ -246,12 +249,14 @@ Where:
   },
   "sources": [
     {
+      "evidence_id": "E5",
       "type": "session",
       "id": "abc123",
       "timestamp": "2024-12-15T10:30:00Z",
       "excerpt": "No, we use Hono for all new endpoints"
     },
     {
+      "evidence_id": "E6",
       "type": "session",
       "id": "def456",
       "timestamp": "2024-12-20T14:15:00Z",
@@ -271,21 +276,21 @@ The following patterns have been explicitly rejected in this project:
 
 ### Critical (Must avoid)
 
-| Pattern | Instead Use | Reason | Occurrences |
-|---------|-------------|--------|-------------|
-| Express.js router | Hono framework | Project standard | 3 |
-| `var` keyword | `const`/`let` | ES6+ requirement | 5 |
+| Pattern | Instead Use | Reason | Evidence |
+|---------|-------------|--------|----------|
+| Express.js router | Hono framework | Project standard | [E5][E6][E7] |
+| `var` keyword | `const`/`let` | ES6+ requirement | [E8][E9] |
 
 ### Warnings
 
-| Pattern | Preferred | Reason |
-|---------|-----------|--------|
-| Inline styles | CSS modules | Maintainability |
+| Pattern | Preferred | Reason | Evidence |
+|---------|-----------|--------|----------|
+| Inline styles | CSS modules | Maintainability | [E10] |
 
 ### Info
 
-- Consider using TypeScript strict mode
-- Prefer named exports over default exports
+- Consider using TypeScript strict mode [E11]
+- Prefer named exports over default exports [E12]
 ```
 
 ## Integration with Skills
@@ -353,3 +358,104 @@ If rejection is context-specific:
 - Process sessions in reverse chronological order
 - Stop after finding 10 high-confidence anti-patterns
 - Sample older sessions (every 5th) for frequency validation
+
+## Review Gate
+
+### Purpose
+
+Critical severity constraints can block code generation and significantly impact workflow. To prevent false positives from becoming blockers, constraints that meet Critical thresholds are initially marked as "Pending Critical" and require human approval before becoming enforced Critical constraints.
+
+### Workflow
+
+```
+┌─────────────────────────────────────────────────────────┐
+│              Anti-pattern Detection                      │
+└────────────────────────┬────────────────────────────────┘
+                         │
+                         ▼
+        ┌─────────────────────────────────────┐
+        │  Auto-classify: Warning or Info     │
+        │  (based on confidence/frequency)    │
+        └────────────────────┬────────────────┘
+                             │
+          ┌──────────────────┴──────────────────┐
+          │ Confidence > 80% && Frequency >= 3? │
+          └──────────────────┬──────────────────┘
+                             │ Yes
+                             ▼
+        ┌─────────────────────────────────────┐
+        │   Mark as "Pending Critical"        │
+        │   (approval_status: pending)        │
+        └────────────────────┬────────────────┘
+                             │
+                             ▼
+        ┌─────────────────────────────────────┐
+        │   Present to user for approval      │
+        │   with evidence excerpts            │
+        └────────────────────┬────────────────┘
+                             │
+          ┌──────────────────┴──────────────────┐
+          │        User response?               │
+          └──────────────────┬──────────────────┘
+               │ Approve           │ Reject/Demote
+               ▼                   ▼
+    ┌──────────────────┐     ┌──────────────────────┐
+    │ Promote to       │     │ Set to Warning       │
+    │ Critical         │     │ or remove constraint │
+    │ (status:approved)│     │ (status: rejected)   │
+    └──────────────────┘     └──────────────────────┘
+```
+
+### Presentation Format
+
+When Pending Critical constraints are detected, present them for approval:
+
+```markdown
+## Pending Critical Constraints (Requires Approval)
+
+The following anti-patterns meet Critical threshold but require your confirmation:
+
+### 1. [constraint-express-router]
+
+- **Detected Pattern**: Don't use Express.js router
+- **Use Instead**: Hono framework
+- **Confidence**: 90%
+- **Found in**: 3 sessions
+
+**Evidence**:
+- [E5] Session abc123: "No, we use Hono for all new endpoints"
+- [E6] Session def456: "Don't use Express, switch to Hono"
+- [E7] Session ghi789: "Express is deprecated in our codebase"
+
+**Action Required**:
+- `approve` - Confirm as Critical (blocks generation if violated)
+- `warning` - Demote to Warning (shows warning but allows)
+- `skip` - Remove this constraint
+
+Your choice: [approve/warning/skip]
+```
+
+### Approval Persistence
+
+Approved constraints are stored with their approval metadata:
+
+```json
+{
+  "id": "constraint-express-router",
+  "severity": "critical",
+  "approval_status": "approved",
+  "approved_at": "2024-12-20T15:30:00Z",
+  "approved_by": "user",
+  "original_confidence": 90
+}
+```
+
+### Automatic Re-review
+
+Previously approved constraints may require re-review if:
+
+- Confidence drops below 70%
+- No new evidence in 90 days
+- Conflicting positive patterns detected
+
+In these cases, the constraint is demoted to "pending_review" status.

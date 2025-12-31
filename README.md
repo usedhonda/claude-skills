@@ -24,6 +24,9 @@
 
 - **Multi-source analysis**: Conversation history, Git commits, and codebase
 - **Negative Learning**: Detects corrections you made to prevent repeated mistakes
+- **Evidence Linking**: Every pattern links to its source evidence `[E1][E2]`
+- **Review Gate**: Human approval required before Critical constraints
+- **Skill Lint**: Auto-validate generated skills for quality
 - **4 pattern categories**: Development, Workflow, Creative, Document
 - **Conflict detection**: Prevents duplicate skills
 
@@ -117,6 +120,9 @@ MIT License - see [LICENSE](LICENSE)
 
 - **マルチソース分析**: 会話履歴、Git、コードベース
 - **負の学習**: 修正履歴から同じ失敗を防止
+- **エビデンスリンク**: 各パターンをソースに紐付け `[E1][E2]`
+- **レビューゲート**: Critical制約には人間の承認が必要
+- **スキルLint**: 生成されたスキルの品質を自動検証
 - **4カテゴリ分類**: Development, Workflow, Creative, Document
 - **重複検出**: 既存スキルとの競合を防止
 
