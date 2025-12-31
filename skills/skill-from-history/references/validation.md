@@ -99,6 +99,15 @@ Constraints Section:
 ℹ Info: not present (optional)
 ```
 
+## File Size Limits
+
+| File | Max Lines | Recommendation |
+|------|-----------|----------------|
+| SKILL.md | 500 | Keep under 400 for headroom |
+| Reference files | 300 | Split if larger |
+
+**Progressive Disclosure**: Move detailed content to `references/` directory. Claude loads these only when needed, reducing token usage.
+
 ## Word Count
 
 | Level | Word Count | Status |

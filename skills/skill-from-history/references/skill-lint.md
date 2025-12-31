@@ -152,6 +152,29 @@ CONT-004:1 - Word count below minimum: 423 words
              Recommended: 1,500-2,000 words
 ```
 
+### File Size Validation (FILE)
+
+| Rule | Description | Severity | Auto-fix |
+|------|-------------|----------|----------|
+| FILE-001 | SKILL.md must be under 500 lines | Error | No |
+| FILE-002 | Use references/ for detailed content over 50 lines | Warning | No |
+| FILE-003 | Each reference file should be under 300 lines | Info | No |
+
+**Rationale**: Claude Code processes SKILL.md on every invocation. Keeping it under 500 lines ensures efficient token usage and faster response times. Detailed content should be moved to references/ which are loaded only when needed.
+
+**Examples**:
+
+```
+FILE-001:1 - SKILL.md exceeds 500 lines (currently 502)
+             Move detailed sections to references/
+
+FILE-002:294 - Section "Skill Generation Template" is 90 lines
+               Consider extracting to references/skill-template.md
+
+FILE-003:1 - Reference file pattern-detection.md exceeds 300 lines (423)
+             Consider splitting into multiple files
+```
+
 ## Execution
 
 ### Command Format
