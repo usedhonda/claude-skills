@@ -1,11 +1,26 @@
 ---
 name: skill-from-history
 description: Analyzes Claude Code conversation history, git commits, and codebase to identify recurring patterns and generate project-specific skills. Invoke with "/skill-from-history" or when user asks to "create skills from history", "analyze patterns", "generate skills from logs", "suggest skills for this project".
+compression-anchors:
+  - "Output: .claude/skills/[name]/SKILL.md + optional command"
+  - "8-step process: Gather→Extract→Classify→Conflict→Propose→Generate"
+  - "Anti-pattern detection from rejection history"
+  - "Evidence linking with [E#] references"
 ---
 
 # Skill from History Generator
 
 A meta-skill that discovers recurring patterns from your project's history and generates reusable Claude Code skills. It analyzes multiple sources to identify both coding patterns and workflow patterns worth capturing.
+
+## TL;DR
+
+**Input**: Claude Code history + Git commits + Codebase
+**Output**: `.claude/skills/[name]/SKILL.md` + optional command file
+**Process**: 8 steps (Gather → Extract → Classify → Conflict → Propose → Generate)
+
+**Quick Actions**:
+- `/gen-skills` - Full analysis and generation
+- "analyze patterns" / "generate skills" - Natural language triggers
 
 ## When to Use
 
@@ -94,143 +109,33 @@ For each existing skill, read SKILL.md and extract:
 
 ### Step 4: Extract Pattern Candidates
 
-Identify potential skills based on:
-
-| Criterion | Weight | Description |
-|-----------|--------|-------------|
-| Frequency | 30% | Pattern appears in 3+ sessions/commits |
-| Reusability | 25% | Contains extractable code templates |
-| Complexity | 20% | Multi-step, non-trivial implementation |
-| Documentation | 15% | Well-explained in history |
-| Specificity | 10% | Project-specific value |
+Score patterns by weighted criteria: Frequency(30%), Reusability(25%), Complexity(20%), Documentation(15%), Specificity(10%).
 
 ### Step 4.5: Extract Anti-patterns (Negative Learning)
 
-Identify patterns the user has explicitly rejected or corrected. This unique feature learns "what NOT to do" from your correction history.
+Detect patterns the user rejected ("No", "Don't", corrections). Classify by severity: Critical (>80% confidence, 3+ occurrences), Warning, Info.
 
-**Detection Signals**:
-
-| Signal Type | Examples | Weight |
-|-------------|----------|--------|
-| Direct rejection | "No", "Don't", "Never use", "That's wrong" | High |
-| Correction | "Actually...", "Instead of X, use Y", "Not like that" | High |
-| Deprecation | "That's outdated", "We don't use X anymore" | Medium |
-| Convention violation | "We always use X for this", "Follow our pattern" | Medium |
-| Re-request | Same question asked again after assistant response | Low |
-
-**Anti-pattern Structure**:
-
-| Field | Description |
-|-------|-------------|
-| trigger | What caused the wrong response |
-| wrong_approach | What was rejected |
-| correct_approach | What should be done instead |
-| reason | Why (if stated) |
-| severity | critical / warning / info |
-
-**Severity Classification**:
-
-| Confidence | Frequency | Severity |
-|------------|-----------|----------|
-| > 80% | 3+ | Critical (must avoid) |
-| > 60% | 2+ | Warning (discouraged) |
-| > 40% | 1+ | Info (consider avoiding) |
-
-For detailed detection algorithms, see [references/anti-pattern-detection.md](references/anti-pattern-detection.md).
+See [references/anti-pattern-detection.md](references/anti-pattern-detection.md) and [references/execution-details.md](references/execution-details.md).
 
 ### Step 5: Classify Patterns
 
-Categorize each pattern into one of four categories:
-
-**Development & Technical**:
-- Error handling approaches
-- API design conventions
-- State management patterns
-- Data validation methods
-- Testing strategies
-
-**Workflow & Process**:
-- Deployment procedures
-- Code review processes
-- Testing workflows
-- Build and release processes
-
-**Creative & Design**:
-- UI component patterns
-- Styling conventions
-- Animation patterns
-- Layout templates
-
-**Document & Data**:
-- Documentation templates
-- Data transformation patterns
-- Report generation
-- Configuration management
+Categorize into: Development & Technical, Workflow & Process, Creative & Design, Document & Data.
 
 ### Step 6: Conflict Detection
 
-For each candidate, perform comprehensive conflict analysis:
+Check for duplicates, overlaps, and semantic conflicts. Resolution options: Merge, Extend, Supersede, Scope, Skip.
 
-**Similarity Check**:
-- **Name similarity**: Levenshtein distance on skill names
-- **Keyword overlap**: Common terms in descriptions
-- **Pattern overlap**: Similar code structures
-
-**Skill Conflict Types**:
-
-| Type | Severity | Description |
-|------|----------|-------------|
-| Duplicate | High | 80%+ similarity with existing skill |
-| Overlap | Medium | 50-80% similarity, partial coverage |
-| Missing Dependency | Medium | Pattern requires another skill |
-| Outdated Reference | Low | References deprecated code/APIs |
-
-**Semantic Conflict Detection** (constraints):
-
-| Conflict Type | Detection | Resolution |
-|---------------|-----------|------------|
-| Direct contradiction | Same subject, opposite polarity | User chooses |
-| Temporal evolution | Newer supersedes older | `supersede` |
-| Scope overlap | Same context, different actions | Define scopes |
-
-Semantic conflicts require resolution before proceeding. For algorithm details, see [references/conflict-detection.md](references/conflict-detection.md).
-
-**Resolution Options**:
-- **Merge**: Combine with existing skill
-- **Extend**: Add as variation to existing skill
-- **Replace/Supersede**: Mark old as superseded, link to new
-- **Scope**: Both valid in different contexts
-- **Skip**: Do not generate
+See [references/conflict-detection.md](references/conflict-detection.md) and [references/execution-details.md](references/execution-details.md).
 
 ### Step 7: Present Proposals
 
-Display candidates grouped by:
-- **New Skill Candidates**: Patterns worthy of new skills
-- **Additions to Existing Skills**: Extensions to current skills
-- **Similar to Existing Skills**: Potential duplicates requiring decision
-- **Detected Constraints**: Anti-patterns from negative learning
+Display grouped candidates with confidence scores and command recommendations (✓ Recommend / △ Optional / - Skip).
 
-Each candidate shows confidence score, source count, key evidence references, and **command recommendation**:
+### Step 7.5: Review Gate
 
-| # | Skill | Category | Confidence | Command? | Reason |
-|---|-------|----------|------------|----------|--------|
-| 1 | multi-ai-review | Workflow | 92% | ✓ Recommend | Clear action trigger |
-| 2 | commit-convention | Workflow | 85% | △ Optional | Reference at commit time |
-| 3 | doc-structure | Document | 88% | - Skip | Pattern reference only |
+Critical constraints (>80% confidence, 3+ frequency) require user approval before enforcement.
 
-**Command Recommendation Criteria**:
-- **✓ Recommend**: Clear trigger action, repeated execution, faster than natural language
-- **△ Optional**: Useful but not essential
-- **- Skip**: Reference-only patterns, high context dependency
-
-### Step 7.5: Review Gate for Critical Constraints
-
-Constraints meeting Critical thresholds (confidence > 80%, frequency >= 3) are marked "Pending Critical" and require user approval:
-- `approve` - Confirm as Critical (blocks generation if violated)
-- `warning` - Demote to Warning (shows warning but allows)
-- `skip` - Remove constraint
-
-For detailed workflow, see [references/anti-pattern-detection.md](references/anti-pattern-detection.md#review-gate).
+See [references/execution-details.md](references/execution-details.md) for detailed tables and criteria.
 
 ### Step 8: Generate and Validate Skills
 
@@ -392,3 +297,13 @@ This skill generates skills that follow Claude Code's official specifications:
 Generated skills are placed in the project's `.claude/skills/` directory and are immediately available for use.
 
 For detailed pattern detection algorithms, see [references/pattern-detection.md](references/pattern-detection.md).
+
+## Key Reminders
+
+Essential points for context retention:
+
+- **Output location**: `.claude/skills/[skill-name]/SKILL.md`
+- **Command generation**: Recommended skills get `.claude/commands/[skill-name].md`
+- **Constraints**: Critical anti-patterns included in generated Constraints section
+- **Validation**: Auto-verified after generation (name, description, sections)
+- **Evidence**: All patterns linked to source via `[E#]` references
