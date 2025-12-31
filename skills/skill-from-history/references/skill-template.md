@@ -109,11 +109,15 @@ Found: 45 conversation sessions, 230 commits, 156 source files
 
 ### New Skill Candidates
 
+| # | Skill | Category | Confidence | Command? | Reason |
+|---|-------|----------|------------|----------|--------|
+| 1 | firebase-auth-flow | Development | 92% | ✓ Recommend | Clear auth action |
+| 2 | api-error-handling | Development | 85% | - Skip | Pattern reference |
+
 1. **firebase-auth-flow** (Confidence: 92%)
    - Category: Development & Technical
    - Found in: 12 sessions, 25 commits
    - Pattern: Firebase authentication with custom claims
-   - Includes: Login, logout, token refresh, role checking
    - Key Evidence:
      - [E1] Session abc123: "Use Firebase custom claims for roles"
      - [E2] Commit a1b2c3d: feat(auth): add custom claims handling
@@ -153,14 +157,16 @@ Claude: Generating firebase-auth-flow skill...
 Created:
 - .claude/skills/firebase-auth-flow/SKILL.md (1,847 words)
 - .claude/skills/firebase-auth-flow/references/patterns.md
+- .claude/commands/firebase-auth-flow.md (Command: ✓ Recommend)
 
 The skill includes:
 - 8 evidence references (E1-E8)
 - Evidence Index with sessions, commits, and code patterns
 - 1 Critical constraint from negative learning
 
-You can now use this skill by mentioning "Firebase auth" or
-"authentication flow" in your prompts.
+You can now use this skill by:
+- Slash command: `/firebase-auth-flow`
+- Natural language: "Firebase auth" or "authentication flow"
 ```
 
 ## Best Practices
@@ -183,3 +189,53 @@ Prioritize evidence that shows:
 Generated skills should also use progressive disclosure:
 - Main SKILL.md: Overview and essential patterns
 - references/: Detailed examples, edge cases, troubleshooting
+
+## Command Template (Optional)
+
+For skills with Command recommendation (✓ Recommend), also generate a command file:
+
+**Location**: `.claude/commands/[skill-name].md`
+
+**Format**:
+```markdown
+---
+description: [Brief description from skill]
+---
+
+# [Skill Title]
+
+[When to Use summary from SKILL.md]
+
+This command invokes the [skill-name] skill.
+
+Usage:
+- `/[skill-name]` - [Primary use case]
+```
+
+**Example**: `.claude/commands/multi-ai-review.md`
+```markdown
+---
+description: Review with ChatGPT and Gemini for comprehensive feedback
+---
+
+# Multi-AI Review
+
+Invoke this command when completing significant features or making architectural decisions.
+
+This command triggers the multi-ai-review workflow:
+1. Prepare review context
+2. Ask ChatGPT for feedback
+3. Ask Gemini for second opinion
+4. Compare and extract common concerns
+
+Usage:
+- `/multi-ai-review` - Start multi-AI review workflow
+```
+
+**When to Generate Commands**:
+
+| Recommendation | Generate Command |
+|----------------|------------------|
+| ✓ Recommend | Yes, automatically |
+| △ Optional | Ask user |
+| - Skip | No |

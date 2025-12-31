@@ -210,7 +210,18 @@ Display candidates grouped by:
 - **Similar to Existing Skills**: Potential duplicates requiring decision
 - **Detected Constraints**: Anti-patterns from negative learning
 
-Each candidate shows confidence score, source count, and key evidence references.
+Each candidate shows confidence score, source count, key evidence references, and **command recommendation**:
+
+| # | Skill | Category | Confidence | Command? | Reason |
+|---|-------|----------|------------|----------|--------|
+| 1 | multi-ai-review | Workflow | 92% | ✓ Recommend | Clear action trigger |
+| 2 | commit-convention | Workflow | 85% | △ Optional | Reference at commit time |
+| 3 | doc-structure | Document | 88% | - Skip | Pattern reference only |
+
+**Command Recommendation Criteria**:
+- **✓ Recommend**: Clear trigger action, repeated execution, faster than natural language
+- **△ Optional**: Useful but not essential
+- **- Skip**: Reference-only patterns, high context dependency
 
 ### Step 7.5: Review Gate for Critical Constraints
 
@@ -231,6 +242,25 @@ Based on user selection:
 ├── SKILL.md
 └── references/
     └── patterns.md
+```
+
+**For skills with Command recommendation**: Also create command file:
+```
+.claude/commands/[skill-name].md
+```
+
+Command file format:
+```markdown
+---
+description: [Brief skill description]
+---
+
+# [Skill Title]
+
+[When to Use summary]
+
+Usage:
+- `/[skill-name]` - [Primary use case]
 ```
 
 **For existing skill updates**:
