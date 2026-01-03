@@ -1,26 +1,27 @@
 ---
 name: skill-from-history
-description: Analyzes Claude Code conversation history, git commits, and codebase to identify recurring patterns and generate project-specific skills. Invoke with "/skill-from-history" or when user asks to "create skills from history", "analyze patterns", "generate skills from logs", "suggest skills for this project".
+description: Analyzes Claude Code conversation history, git commits, and codebase to identify recurring patterns and generate project-specific agents and skills. Invoke with "/gen-all", "/gen-agents", "/gen-skills", or when user asks to "create skills from history", "analyze patterns", "generate agents".
 compression-anchors:
-  - "Output: .claude/skills/[name]/SKILL.md + optional command"
-  - "8-step process: Gather→Extract→Classify→Conflict→Propose→Generate"
-  - "Anti-pattern detection from rejection history"
-  - "Evidence linking with [E#] references"
+  - "Output: .claude/agents/[name]/AGENT.md + .claude/skills/[name]/SKILL.md"
+  - "9-step process: Gather→Agents→Skills→Conflict→Propose→Generate"
+  - "Agent detection from role/perspective patterns"
+  - "Bidirectional: Agent→Skill (skills:) and Skill→Agent (agents:)"
 ---
 
 # Skill from History Generator
 
-A meta-skill that discovers recurring patterns from your project's history and generates reusable Claude Code skills. It analyzes multiple sources to identify both coding patterns and workflow patterns worth capturing.
+A meta-skill that discovers recurring patterns from your project's history and generates reusable Claude Code **agents** and **skills**. Agents define roles/perspectives; skills define workflows/procedures. Agents are generated first, then skills can reference them.
 
 ## TL;DR
 
 **Input**: Claude Code history + Git commits + Codebase
-**Output**: `.claude/skills/[name]/SKILL.md` + optional command file
-**Process**: 8 steps (Gather → Extract → Classify → Conflict → Propose → Generate)
+**Output**: `.claude/agents/[name]/AGENT.md` + `.claude/skills/[name]/SKILL.md`
+**Process**: 9 steps (Gather → Agents → Skills → Conflict → Propose → Generate)
 
 **Quick Actions**:
-- `/gen-skills` - Full analysis and generation
-- "analyze patterns" / "generate skills" - Natural language triggers
+- `/gen-all` - Generate agents + skills (recommended)
+- `/gen-agents` - Agents only
+- `/gen-skills` - Skills only
 
 ## When to Use
 
@@ -106,6 +107,26 @@ For each existing skill, read SKILL.md and extract:
 - Skill name
 - Description keywords
 - Core patterns covered
+
+Also scan `.claude/agents/` for existing agents.
+
+### Step 3.5: Extract Agent Patterns
+
+Detect recurring role/perspective patterns from conversation history:
+
+**Detection Signals** (weighted):
+| Signal | Weight | Example |
+|--------|--------|---------|
+| Role descriptions | 35% | "As a security expert..." |
+| Perspective consistency | 30% | Same viewpoint across sessions |
+| Tool usage patterns | 20% | Grep + Read combinations |
+| Task tool invocations | 15% | Similar prompts repeated |
+
+**Threshold**: 60% confidence, 3+ occurrences
+
+**Output**: Agent candidates with role, perspective, prompt template.
+
+See [references/agent-detection.md](references/agent-detection.md) for algorithms.
 
 ### Step 4: Extract Pattern Candidates
 
@@ -302,8 +323,15 @@ For detailed pattern detection algorithms, see [references/pattern-detection.md]
 
 Essential points for context retention:
 
-- **Output location**: `.claude/skills/[skill-name]/SKILL.md`
-- **Command generation**: Recommended skills get `.claude/commands/[skill-name].md`
-- **Constraints**: Critical anti-patterns included in generated Constraints section
-- **Validation**: Auto-verified after generation (name, description, sections)
+- **Agent output**: `.claude/agents/[name]/AGENT.md` (generated first)
+- **Skill output**: `.claude/skills/[name]/SKILL.md` (can reference agents)
+- **Bidirectional**: Agent→Skill (`skills:` field) and Skill→Agent (`agents:` field)
+- **Commands**: `/gen-all` (both), `/gen-agents`, `/gen-skills`
+- **Agent detection**: Role descriptions, perspectives, tool patterns
+- **Validation**: agent-lint + skill-lint + XREF rules
 - **Evidence**: All patterns linked to source via `[E#]` references
+
+**Reference docs**:
+- [agent-template.md](references/agent-template.md) - AGENT.md format
+- [agent-detection.md](references/agent-detection.md) - Detection algorithms
+- [agent-lint.md](references/agent-lint.md) - Validation rules
