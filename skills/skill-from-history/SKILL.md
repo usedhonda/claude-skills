@@ -6,6 +6,7 @@ compression-anchors:
   - "9-step process: Gather→Agents→Skills→Conflict→Propose→Generate"
   - "Governance: Maturity(Draft→Accepted→Canonical), Epochs, Staleness, Golden Tasks"
   - "Bidirectional: Agent→Skill (skills:) and Skill→Agent (agents:)"
+  - "Global: ~/.claude/global-skills/ + Quarantine + Secret Redaction"
 ---
 
 # Skill from History Generator
@@ -404,16 +405,24 @@ Essential points for context retention:
 - **Agent output**: `.claude/agents/[name]/AGENT.md` (generated first)
 - **Skill output**: `.claude/skills/[name]/SKILL.md` (can reference agents)
 - **Bidirectional**: Agent→Skill (`skills:` field) and Skill→Agent (`agents:` field)
-- **Commands**: `/gen-all` (both), `/gen-agents`, `/gen-skills`, `/skill-eval`
+- **Commands**: `/gen-all`, `/gen-agents`, `/gen-skills`, `/skill-eval`, `/skill-promote`, `/skill-globalize`, `/skill-import`
 - **Governance**: Maturity (Draft→Accepted→Canonical→Deprecated), Epochs, Staleness
+- **Workflow**: Observe → Draft → Promote → Refine
 - **Promotion rule**: Eval Pass + Staleness Check + Rationale required
 - **Override**: `ALLOW_CONSTRAINT: CONS-XXX` with REASON
+- **Orchestrator**: Flat hierarchy only (Main → Specialist, no recursion)
+- **Global Skills**: `~/.claude/global-skills/` for cross-project sharing
+- **Quarantine**: External skills start as Draft + `external: true`, 14-day review
 - **Validation**: agent-lint + skill-lint + XREF rules + Golden Tasks
 - **Evidence**: All patterns linked to source via `[E#]` references
 
 **Reference docs**:
 - [lifecycle.md](references/lifecycle.md) - Maturity, Epochs, Staleness, Override
 - [golden-tasks.md](references/golden-tasks.md) - Evaluation harness
+- [evaluation.md](references/evaluation.md) - Eval system details
+- [workflow.md](references/workflow.md) - Proposal-Commit, Mermaid, Rationale
+- [orchestrator.md](references/orchestrator.md) - Broker/Dispatcher pattern
+- [global-skills.md](references/global-skills.md) - Cross-Project Learning, Quarantine
 - [agent-template.md](references/agent-template.md) - AGENT.md format
 - [agent-detection.md](references/agent-detection.md) - Detection algorithms
 - [agent-lint.md](references/agent-lint.md) - Validation rules
