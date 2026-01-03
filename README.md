@@ -77,9 +77,17 @@ Long contexts lose focus in the middle. We anchor critical decisions at the edge
 - Conflict detection and resolution
 - Command generation for frequently-used skills
 
+**v3.0 Governance:**
+- Constraint Maturity (Draft → Accepted → Canonical → Deprecated)
+- Epochs (time-based rule archival)
+- Golden Tasks (evaluation harness)
+- Cross-Project Learning (global skills with quarantine)
+
 **Quick Start:**
 ```bash
-/gen-skills
+/gen-all        # Generate agents + skills
+/skill-eval     # Run Golden Tasks
+/skill-promote  # Promote validated constraints
 ```
 
 Or say: "create skills from history", "analyze patterns"
@@ -199,9 +207,17 @@ MIT License - see [LICENSE](LICENSE)
 - 衝突検出と解決
 - 頻用スキルのコマンド生成
 
+**v3.0 ガバナンス:**
+- 制約成熟度（Draft → Accepted → Canonical → Deprecated）
+- Epochs（時代ベースのルールアーカイブ）
+- Golden Tasks（評価ハーネス）
+- クロスプロジェクト学習（検疫付きグローバルスキル）
+
 **クイックスタート:**
 ```bash
-/gen-skills
+/gen-all        # エージェント + スキル生成
+/skill-eval     # Golden Tasks実行
+/skill-promote  # 検証済み制約の昇格
 ```
 
 または「履歴からスキル作成」「パターン分析」と入力
