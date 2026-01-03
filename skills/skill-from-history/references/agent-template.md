@@ -29,6 +29,11 @@ skills:
 compression-anchors:
   - "[TL;DR要約1]"
   - "[TL;DR要約2]"
+updated_at: [YYYY-MM-DD]
+update_history:
+  - version: [X.X]
+    date: [YYYY-MM-DD]
+    changes: "[変更内容の要約]"
 ---
 ```
 
@@ -38,6 +43,8 @@ compression-anchors:
 | `description` | Yes | 256文字 | 役割 + トリガーフレーズ |
 | `skills` | No | - | このエージェントがロードするスキル |
 | `compression-anchors` | No | 3項目 | コンテキスト圧縮時の保持情報 |
+| `updated_at` | No | - | 最終更新日（自動更新） |
+| `update_history` | No | - | 更新履歴（gen-all で自動追記） |
 
 ### Markdown Body
 
@@ -106,6 +113,14 @@ skills:
 compression-anchors:
   - "OWASP Top 10、重大度別レポート"
   - "ツール: Grep, Read, Glob"
+updated_at: 2025-01-03
+update_history:
+  - version: 1.1
+    date: 2025-01-03
+    changes: "+2 evidence, +1 constraint (eval禁止)"
+  - version: 1.0
+    date: 2024-12-15
+    changes: "Initial generation"
 ---
 
 # Security Auditor

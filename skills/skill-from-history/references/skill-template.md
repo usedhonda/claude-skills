@@ -10,6 +10,11 @@ Generated skills follow this structure with evidence linking:
 ---
 name: [skill-name]
 description: [Extracted description with trigger phrases from patterns]
+agents:                    # Optional: recommended agents for this skill
+  - name: [agent-name]
+    phase: [phase-name]    # Which step uses this agent
+    required: [true/false] # Is the agent essential?
+updated_at: [YYYY-MM-DD]   # Last update date
 ---
 
 # [Skill Title]
@@ -47,6 +52,16 @@ description: [Extracted description with trigger phrases from patterns]
 
 - [Practice observed in history] [E3]
 - [Practice observed in history] [E7]
+
+## Agent Dependencies (Optional)
+
+If this skill benefits from specialized agents:
+
+| Agent | Phase | Required | Purpose |
+|-------|-------|----------|---------|
+| [agent-name] | [phase] | Yes/No | [Why this agent helps] |
+
+**Usage**: The `[agent-name]` agent provides consistent [perspective] for this workflow.
 
 ## Constraints (Auto-generated from negative learning)
 

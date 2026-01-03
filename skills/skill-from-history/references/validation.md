@@ -150,6 +150,87 @@ Status: PASS
 - Whitespace normalization
 - Duplicate section removal
 
+## XREF: Cross-Reference Validation
+
+Rules for validating agent-skill bidirectional references.
+
+### XREF-001: agents: Reference Exists
+
+**Severity**: Error
+
+Skills referencing agents must have valid targets.
+
+```yaml
+# SKILL.md
+agents:
+  - name: security-auditor  # Must exist at .claude/agents/security-auditor/AGENT.md
+```
+
+**Validation**:
+```
+✓ agents[0].name 'security-auditor' → .claude/agents/security-auditor/AGENT.md exists
+✗ agents[1].name 'nonexistent' → NOT FOUND
+```
+
+### XREF-002: Circular Reference Check
+
+**Severity**: Error
+
+Prevent Agent → Skill → Agent loops.
+
+```
+✗ Error: Circular reference detected
+  security-auditor → secure-coding-patterns → security-auditor
+```
+
+### XREF-003: Declaration-Usage Match
+
+**Severity**: Warning
+
+Agents declared in frontmatter should be referenced in content.
+
+```yaml
+# Frontmatter
+agents:
+  - name: code-reviewer
+  - name: security-auditor  # Warning: not referenced in content
+```
+
+```markdown
+## Implementation Steps
+
+### Step 2: Review
+Use the `code-reviewer` agent for this phase.
+# Note: security-auditor not mentioned → Warning
+```
+
+### XREF-004: skills: Reference in AGENT.md
+
+**Severity**: Warning
+
+Agents referencing skills should have valid targets.
+
+```yaml
+# AGENT.md
+skills:
+  - secure-coding-patterns  # Must exist at .claude/skills/secure-coding-patterns/SKILL.md
+```
+
+### XREF Validation Output
+
+```
+XREF Validation Results:
+
+✓ XREF-001: All agent references valid (2/2)
+✓ XREF-002: No circular references
+⚠ XREF-003: 'security-auditor' declared but not used in content
+✓ XREF-004: All skill references valid (1/1)
+
+Status: PASS (1 warning)
+```
+
+---
+
 ## Extended Validation (Skill Lint)
 
 For comprehensive validation including link checking, evidence validation, and structure analysis, see [skill-lint.md](skill-lint.md).
@@ -160,3 +241,4 @@ Skill Lint provides additional rules:
 - **CONS**: Ensure constraints have proper evidence backing
 - **STRU**: Check markdown structure and hierarchy
 - **CONT**: Detect placeholder text and TODO markers
+- **XREF**: Validate agent-skill cross-references (see above)
