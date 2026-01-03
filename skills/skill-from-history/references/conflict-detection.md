@@ -336,3 +336,120 @@ resolution: "supersede" --reason "Team decision to migrate"
 ```
 
 Override reasons are recorded in conflict resolution log.
+
+## Skill Update Detection
+
+When generating new skills, check for updates to existing skills.
+
+### Update Detection Flow
+
+```
+新規パターン vs 既存スキル
+    │
+    ├─ >= 80%（重複）
+    │   ├─ 新パターンあり → 更新提案
+    │   └─ 新パターンなし → スキップ
+    │
+    ├─ 50-79%（類似）→ 拡張提案（別スキルとして）
+    │
+    └─ < 50%（新規）→ 新規生成
+```
+
+### 新パターン検出項目
+
+| 項目 | 検出方法 | 更新箇所 |
+|------|---------|---------|
+| 新エビデンス | 新しいセッション/コミット | Evidence Index |
+| 新制約 | 新しい rejection パターン | Constraints セクション |
+| 新手順 | 新しいワークフローステップ | Core Pattern セクション |
+| 新ベストプラクティス | 繰り返しの推奨パターン | Best Practices セクション |
+| 新エージェント参照 | 推奨エージェントの検出 | agents: フィールド |
+
+### 更新提案表示
+
+```markdown
+## Existing Skill Updates
+
+| Skill | Match | Updates | Details |
+|-------|-------|---------|---------|
+| multi-ai-review | 88% | +2 evidence, +1 step | New synthesis step |
+| secure-coding | 75% | +3 constraints | New injection patterns |
+| api-design | 92% | (none) | No new patterns |
+
+[S1] Update multi-ai-review? (y/n/diff):
+[S2] Update secure-coding? (y/n/diff):
+```
+
+### 更新マージ処理
+
+```python
+def merge_skill_updates(existing: Skill, new_patterns: Patterns) -> Skill:
+    # 1. Evidence Index に追加
+    for evidence in new_patterns.evidence:
+        if evidence not in existing.evidence:
+            existing.evidence.append(evidence)
+
+    # 2. Constraints に追加（重複チェック付き）
+    for constraint in new_patterns.constraints:
+        if not has_similar_constraint(existing.constraints, constraint):
+            existing.constraints.append(constraint)
+
+    # 3. Core Pattern にステップ追加
+    for step in new_patterns.steps:
+        if step.is_new_phase:
+            existing.core_pattern.insert_step(step)
+
+    # 4. agents: フィールドに追加
+    for agent in new_patterns.recommended_agents:
+        if agent not in existing.agents:
+            existing.agents.append(agent)
+
+    # 5. updated_at 記録
+    existing.updated_at = now()
+
+    return existing
+```
+
+### 差分表示（diff オプション）
+
+```diff
+## Core Pattern
+
+### Step 1: Prepare Context
+  [unchanged]
+
+### Step 2: Ask ChatGPT
+  [unchanged]
+
++ ### Step 2.5: Cross-validate
++ Compare ChatGPT response with project constraints.
+
+### Step 3: Ask Gemini
+  [unchanged]
+
+## Constraints
+
+| Pattern | Instead | Reason | Evidence |
+|---------|---------|--------|----------|
+  Single AI review | Multi-AI approach | Coverage | [E1] |
++ Skip synthesis | Always synthesize | Quality | [E12][E13] |
+```
+
+### 更新履歴
+
+更新されたスキルには履歴を記録：
+
+```yaml
+---
+name: multi-ai-review
+description: ...
+updated_at: 2025-01-03
+update_history:
+  - version: 1.1
+    date: 2025-01-03
+    changes: "+1 step (Cross-validate), +2 evidence"
+  - version: 1.0
+    date: 2024-12-15
+    changes: "Initial generation"
+---
+```

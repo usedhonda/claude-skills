@@ -179,18 +179,89 @@ def extract_agent_patterns(sources):
     return filter(lambda p: p.confidence >= 0.6, patterns)
 ```
 
-### Step 3: 重複検出
+### Step 3: 重複検出 & 更新判定
 
-既存エージェントとの類似度チェック。
+既存エージェントとの類似度チェックと更新提案。
 
 ```
-既存: security-auditor (80% 類似)
-新規: vulnerability-checker
+既存との類似度チェック
+    │
+    ├─ >= 80%（重複）
+    │   ├─ 新パターンあり → 更新提案
+    │   └─ 新パターンなし → スキップ
+    │
+    ├─ 50-79%（類似）→ 拡張提案（別名で新規作成）
+    │
+    └─ < 50%（新規）→ 新規生成
+```
 
-判定:
-- >= 80%: 重複（スキップまたはマージ）
-- 50-79%: 類似（拡張を提案）
-- < 50%: 新規（生成）
+### 新パターン検出
+
+既存エージェントと新規候補を比較し、差分を抽出：
+
+| 比較項目 | 検出方法 | 更新内容 |
+|---------|---------|---------|
+| エビデンス | 新規セッション/コミット | Evidence Index に追加 |
+| 視点 | 新しい perspective キーワード | Role/Perspective に追記 |
+| 制約 | 新しい rejection パターン | Constraints に追加 |
+| ツール | 新しいツール組み合わせ | tool_patterns 更新 |
+| スキル参照 | 新しいスキル使用 | skills: フィールドに追加 |
+
+### 更新提案表示
+
+```markdown
+## Existing Agent Updates
+
+| Agent | Match | New Evidence | New Constraints | Action |
+|-------|-------|--------------|-----------------|--------|
+| security-auditor | 85% | +3 sessions | +1 constraint | Update? |
+| code-reviewer | 92% | +1 commit | (none) | Update? |
+| api-designer | 88% | (none) | (none) | Skip |
+
+[U1] Update security-auditor? (y/n/diff):
+[U2] Update code-reviewer? (y/n/diff):
+```
+
+### 更新マージ処理
+
+```python
+def merge_agent_updates(existing: Agent, new_patterns: Patterns) -> Agent:
+    # 1. Evidence Index に新規エビデンスを追加
+    existing.evidence.extend(new_patterns.evidence)
+
+    # 2. Constraints に新規制約を追加
+    for constraint in new_patterns.constraints:
+        if constraint not in existing.constraints:
+            existing.constraints.append(constraint)
+
+    # 3. skills: に新規参照を追加
+    for skill in new_patterns.skills:
+        if skill not in existing.skills:
+            existing.skills.append(skill)
+
+    # 4. 更新日時を記録
+    existing.updated_at = now()
+
+    return existing
+```
+
+### 差分表示（diff オプション）
+
+```diff
+## Evidence Index
+
+| ID | Source | Date | Description |
+|----|--------|------|-------------|
+  [E1] | session:abc123 | 2024-12-15 | Original evidence |
++ [E4] | session:xyz789 | 2025-01-02 | New security pattern |
++ [E5] | commit:a1b2c3d | 2025-01-03 | Security fix commit |
+
+## Constraints
+
+| Pattern | Instead | Reason | Evidence |
+|---------|---------|--------|----------|
+  SQL string concat | Parameterized query | Injection risk | [E1] |
++ eval() usage | Safe alternatives | Code injection | [E4][E5] |
 ```
 
 ---

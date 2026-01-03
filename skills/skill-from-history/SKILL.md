@@ -142,11 +142,28 @@ See [references/anti-pattern-detection.md](references/anti-pattern-detection.md)
 
 Categorize into: Development & Technical, Workflow & Process, Creative & Design, Document & Data.
 
-### Step 6: Conflict Detection
+### Step 6: Conflict Detection & Update Proposal
 
-Check for duplicates, overlaps, and semantic conflicts. Resolution options: Merge, Extend, Supersede, Scope, Skip.
+Check for duplicates, overlaps, and semantic conflicts. **Also detect updates to existing agents/skills**.
 
-See [references/conflict-detection.md](references/conflict-detection.md) and [references/execution-details.md](references/execution-details.md).
+**判定フロー**:
+```
+>= 80% 類似 → 新パターンあり? → 更新提案 / スキップ
+50-79% 類似 → 拡張提案（別名で新規）
+< 50% → 新規生成
+```
+
+**更新提案の表示**:
+```
+## Existing Updates
+
+| Type | Name | Match | New Patterns | Action |
+|------|------|-------|--------------|--------|
+| Agent | security-auditor | 85% | +2 evidence | Update? |
+| Skill | multi-ai-review | 88% | +1 step | Update? |
+```
+
+See [references/conflict-detection.md](references/conflict-detection.md) and [references/agent-detection.md](references/agent-detection.md).
 
 ### Step 7: Present Proposals
 
