@@ -8,6 +8,9 @@
       "path": "skills/skill-from-history"
     }
   ],
-  "commands": ["./commands/"],
+  "commands": [
+    "./commands/",
+    "./skills/skill-from-history/commands/"
+  ],
   "repository": "https://github.com/usedhonda/claude-skills"
 }
