@@ -4,7 +4,7 @@ description: Analyzes Claude Code conversation history, git commits, and codebas
 compression-anchors:
   - "Output: .claude/agents/[name]/AGENT.md + .claude/skills/[name]/SKILL.md"
   - "9-step process: Gather→Agents→Skills→Conflict→Propose→Generate"
-  - "Agent detection from role/perspective patterns"
+  - "Governance: Maturity(Draft→Accepted→Canonical), Epochs, Staleness, Golden Tasks"
   - "Bidirectional: Agent→Skill (skills:) and Skill→Agent (agents:)"
 ---
 
@@ -287,6 +287,67 @@ Check code changes against project constraints before commit or PR.
 
 For detailed workflow and integration options, see [references/review-mode.md](references/review-mode.md).
 
+## Governance (v3.0)
+
+制約とスキルのライフサイクル管理。
+
+### Constraint Maturity
+
+制約は成熟度レベルを持つ：
+
+| Level | 説明 | 強制力 |
+|-------|------|--------|
+| **Draft** | 提案段階 | Warning のみ |
+| **Accepted** | 承認済み | Warning + CI Warning |
+| **Canonical** | 標準規則 | Error + CI Block |
+| **Deprecated** | 非推奨 | Info のみ |
+
+昇格には: Eval Pass + Staleness Check + Rationale 記録が必要。
+
+### Epochs
+
+プロジェクトの時代区分。古い Epoch のルールは現在では適用されない。
+
+```yaml
+epochs:
+  - id: E1
+    name: monolith-era
+    status: deprecated
+  - id: E2
+    name: microservices-era
+    status: active
+current_epoch: E2
+```
+
+### Staleness & Drift
+
+- **Staleness Score**: 時間減衰 + 再確認 + 違反回数で計算（0-1）
+- **Drift Detection**: パターン消失、違反急増、頻繁なオーバーライドを検出
+- **TTL**: 制約には有効期限があり、期限切れで自動 Deprecation
+
+### Override Protocol
+
+制約を例外的に無視する場合：
+
+```
+ALLOW_CONSTRAINT: CONS-001
+REASON: Legacy compatibility required
+```
+
+Override は記録され、Staleness スコアに影響する。
+
+### Golden Tasks (Eval Harness)
+
+制約の有効性を検証するテストスイート：
+
+```bash
+$ /skill-eval           # Golden Tasks 実行
+$ /skill-eval --baseline  # ベースライン比較
+$ /skill-eval --regression CONS-NEW  # 回帰テスト
+```
+
+詳細は [references/lifecycle.md](references/lifecycle.md) と [references/golden-tasks.md](references/golden-tasks.md) を参照。
+
 ## Configuration
 
 ### Minimum Thresholds
@@ -343,12 +404,16 @@ Essential points for context retention:
 - **Agent output**: `.claude/agents/[name]/AGENT.md` (generated first)
 - **Skill output**: `.claude/skills/[name]/SKILL.md` (can reference agents)
 - **Bidirectional**: Agent→Skill (`skills:` field) and Skill→Agent (`agents:` field)
-- **Commands**: `/gen-all` (both), `/gen-agents`, `/gen-skills`
-- **Agent detection**: Role descriptions, perspectives, tool patterns
-- **Validation**: agent-lint + skill-lint + XREF rules
+- **Commands**: `/gen-all` (both), `/gen-agents`, `/gen-skills`, `/skill-eval`
+- **Governance**: Maturity (Draft→Accepted→Canonical→Deprecated), Epochs, Staleness
+- **Promotion rule**: Eval Pass + Staleness Check + Rationale required
+- **Override**: `ALLOW_CONSTRAINT: CONS-XXX` with REASON
+- **Validation**: agent-lint + skill-lint + XREF rules + Golden Tasks
 - **Evidence**: All patterns linked to source via `[E#]` references
 
 **Reference docs**:
+- [lifecycle.md](references/lifecycle.md) - Maturity, Epochs, Staleness, Override
+- [golden-tasks.md](references/golden-tasks.md) - Evaluation harness
 - [agent-template.md](references/agent-template.md) - AGENT.md format
 - [agent-detection.md](references/agent-detection.md) - Detection algorithms
 - [agent-lint.md](references/agent-lint.md) - Validation rules

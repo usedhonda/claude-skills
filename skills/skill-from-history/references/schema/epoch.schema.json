@@ -1,0 +1,50 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://claude-skills.dev/schemas/epoch.json",
+  "title": "Epoch",
+  "description": "Project epoch (era) definition",
+  "type": "object",
+  "required": ["id", "name", "status"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^E[0-9]+$",
+      "description": "Epoch identifier (E1, E2, ...)"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Human-readable epoch name"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["deprecated", "active", "planned"],
+      "description": "Epoch status"
+    },
+    "description": {
+      "type": "string",
+      "description": "What characterizes this epoch"
+    },
+    "started_at": {
+      "type": "string",
+      "format": "date",
+      "description": "When this epoch began"
+    },
+    "ended_at": {
+      "type": "string",
+      "format": "date",
+      "description": "When this epoch ended (if deprecated)"
+    },
+    "constraints_mode": {
+      "type": "string",
+      "enum": ["strict", "mixed", "lenient"],
+      "default": "strict",
+      "description": "How to apply constraints from this epoch"
+    },
+    "superseded_by": {
+      "type": "string",
+      "pattern": "^E[0-9]+$",
+      "description": "Epoch that replaced this one"
+    }
+  }
+}

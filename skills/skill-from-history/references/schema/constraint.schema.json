@@ -1,0 +1,126 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://claude-skills.dev/schemas/constraint.json",
+  "title": "Constraint",
+  "description": "A project constraint extracted from history",
+  "type": "object",
+  "required": ["id", "pattern", "maturity", "created_at"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^CONS-[0-9]{3,}$",
+      "description": "Unique constraint identifier"
+    },
+    "pattern": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Pattern to avoid or reject"
+    },
+    "instead": {
+      "type": "string",
+      "description": "Recommended alternative pattern"
+    },
+    "reason": {
+      "type": "string",
+      "description": "Why this constraint exists"
+    },
+    "rationale": {
+      "type": "string",
+      "description": "Detailed rationale (required for Canonical)"
+    },
+    "maturity": {
+      "type": "string",
+      "enum": ["draft", "accepted", "canonical", "deprecated"],
+      "description": "Constraint maturity level"
+    },
+    "severity": {
+      "type": "string",
+      "enum": ["critical", "warning", "info"],
+      "default": "warning"
+    },
+    "epoch_id": {
+      "type": "string",
+      "pattern": "^E[0-9]+$",
+      "description": "Epoch this constraint belongs to"
+    },
+    "supersedes": {
+      "type": "string",
+      "description": "ID of constraint this replaces"
+    },
+    "evidence": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^E[0-9]+$"
+      },
+      "description": "Evidence references [E1, E2, ...]"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date",
+      "description": "Creation date"
+    },
+    "accepted_at": {
+      "type": "string",
+      "format": "date",
+      "description": "Date accepted"
+    },
+    "canonical_at": {
+      "type": "string",
+      "format": "date",
+      "description": "Date promoted to canonical"
+    },
+    "deprecated_at": {
+      "type": "string",
+      "format": "date",
+      "description": "Date deprecated"
+    },
+    "ttl": {
+      "type": "object",
+      "properties": {
+        "review_by": {
+          "type": "string",
+          "format": "date"
+        },
+        "expires_at": {
+          "type": "string",
+          "format": "date"
+        },
+        "auto_renew": {
+          "type": "boolean",
+          "default": false
+        }
+      }
+    },
+    "staleness": {
+      "type": "object",
+      "properties": {
+        "score": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "last_activity": {
+          "type": "string",
+          "format": "date"
+        },
+        "reaffirmations": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "violations": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "overrides": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "status": {
+          "type": "string",
+          "enum": ["fresh", "aging", "stale", "expired"]
+        }
+      }
+    }
+  }
+}

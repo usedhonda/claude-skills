@@ -1,0 +1,80 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://claude-skills.dev/schemas/evaluation-result.json",
+  "title": "EvaluationResult",
+  "description": "Result of evaluating a constraint or skill against golden tasks",
+  "type": "object",
+  "required": ["constraint_id", "evaluated_at", "status"],
+  "properties": {
+    "constraint_id": {
+      "type": "string",
+      "description": "ID of constraint or skill evaluated"
+    },
+    "evaluated_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When evaluation was run"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["pass", "fail", "skip", "error"],
+      "description": "Overall evaluation status"
+    },
+    "golden_tasks": {
+      "type": "object",
+      "properties": {
+        "total": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "passed": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "failed": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "skipped": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "baseline_comparison": {
+      "type": "object",
+      "properties": {
+        "without_constraint": {
+          "type": "object",
+          "properties": {
+            "success_rate": { "type": "number" },
+            "failures": { "type": "integer" }
+          }
+        },
+        "with_constraint": {
+          "type": "object",
+          "properties": {
+            "success_rate": { "type": "number" },
+            "failures": { "type": "integer" }
+          }
+        },
+        "improvement": {
+          "type": "number",
+          "description": "Positive = constraint helps, Negative = constraint hurts"
+        }
+      }
+    },
+    "regression_detected": {
+      "type": "boolean",
+      "description": "True if constraint makes things worse"
+    },
+    "promotion_eligible": {
+      "type": "boolean",
+      "description": "True if eligible for maturity promotion"
+    },
+    "notes": {
+      "type": "string",
+      "description": "Additional evaluation notes"
+    }
+  }
+}
