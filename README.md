@@ -92,6 +92,25 @@ Long contexts lose focus in the middle. We anchor critical decisions at the edge
 
 Or say: "create skills from history", "analyze patterns"
 
+### [parallel-dev-orchestrator](skills/parallel-dev-orchestrator/SKILL.md) `v3.2.0`
+
+> **Boris-style CLI⇄Web Parallel Development** - Orchestrate multiple Claude Code sessions.
+
+**Key Features:**
+- Task decomposition with worktree-dispatcher agent
+- Multiple dispatch methods (& experimental, worktree, manual web)
+- Auto-merge via `gh pr merge --auto`
+- Progress monitoring and report generation
+
+**Quick Start:**
+```bash
+/orchestrate "Add OAuth2 authentication"
+/dispatch --task T01
+/harvest --watch
+```
+
+Or say: "parallel development", "task decomposition"
+
 ## Installation
 
 ### Via Plugin (Recommended)
@@ -221,6 +240,25 @@ MIT License - see [LICENSE](LICENSE)
 ```
 
 または「履歴からスキル作成」「パターン分析」と入力
+
+### [parallel-dev-orchestrator](skills/parallel-dev-orchestrator/SKILL.md) `v3.2.0`
+
+> **Boris流CLI⇄Web並列開発** - 複数のClaude Codeセッションをオーケストレート。
+
+**主な機能:**
+- worktree-dispatcherエージェントによるタスク分解
+- 複数のdispatch方式（&試験的、worktree、手動web）
+- `gh pr merge --auto`による自動マージ
+- 進捗監視とレポート生成
+
+**クイックスタート:**
+```bash
+/orchestrate "OAuth2認証を追加"
+/dispatch --task T01
+/harvest --watch
+```
+
+または「並列開発」「タスク分解」と入力
 
 ## インストール
 
