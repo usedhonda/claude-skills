@@ -57,6 +57,36 @@ Start now. &
 - Webに接続されない → 手動Web投入
 - ブランチが切り替わらない → ブランチを事前push確認
 
+### 自動フォールバック条件
+
+`&` 方式から Worktree へ自動切替する判定基準：
+
+| 条件 | 判定方法 | タイムアウト |
+|------|----------|--------------|
+| PRが作成されない | `gh pr list --search "cc/$TIMESTAMP"` | 5分 |
+| ブランチに変更なし | `git log origin/$BRANCH --since="5 min ago"` | 5分 |
+| Webセッション不明 | 手動確認が必要 | - |
+
+```bash
+# フォールバック判定スクリプト
+TIMESTAMP="20260105-1400"
+TASK_ID="t01"
+TIMEOUT_MIN=5
+
+# N分待機
+sleep $((TIMEOUT_MIN * 60))
+
+# PRが見つかるか確認
+PR_COUNT=$(gh pr list --search "cc/$TIMESTAMP/$TASK_ID" --json number -q 'length')
+
+if [ "$PR_COUNT" = "0" ]; then
+  echo "⚠️ & 方式タイムアウト → Worktree へフォールバック"
+  # Worktree 方式を実行
+fi
+```
+
+> **推奨**: 初回は5分、信頼性確認後は3分に短縮
+
 ---
 
 ## Method 2: Worktree方式

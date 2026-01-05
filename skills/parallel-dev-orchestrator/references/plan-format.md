@@ -60,9 +60,31 @@ timestamp: "20260105-1400"
 id: T01
 ```
 
-- 形式: `T` + 2桁数字
+- 形式: `T` + 2桁数字（大文字）
 - 連番で付与
 - merge_order等で参照
+
+### 命名正規化ルール
+
+| 場所 | 形式 | 例 |
+|------|------|-----|
+| `tasks[].id` | 大文字 `T` + 2桁数字 | `T01`, `T02` |
+| ブランチ名 | 小文字 `t` + 2桁数字 | `cc/.../t01-oauth` |
+| worktree名 | 小文字 `t` + 2桁数字 | `.worktrees/t01` |
+| PR検索 | 小文字で検索 | `gh pr list --search "t01"` |
+| ログ出力 | 大文字で表示 | `T01: OAuth2追加` |
+
+```bash
+# ID → ブランチ名変換
+TASK_ID="T01"
+BRANCH_ID=$(echo "$TASK_ID" | tr 'A-Z' 'a-z')  # → t01
+
+# ブランチ名 → ID変換
+BRANCH="cc/20260105-1400/t01-oauth"
+TASK_ID=$(echo "$BRANCH" | sed -E 's/.*\/(t[0-9]+)-.*/\U\1/')  # → T01
+```
+
+> **原則**: plan.yaml内は大文字、ファイルシステム/Git は小文字
 
 ### tasks[].branch
 
