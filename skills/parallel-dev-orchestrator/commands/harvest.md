@@ -68,8 +68,20 @@ for pr in $(gh pr list --search "cc/$TIMESTAMP" --json number,headRefName -q '.[
   # ブランチ名からタスクIDを抽出（例: cc/20260105-1400/t01-oauth → T01）
   TASK_ID=$(echo $BRANCH | sed -E 's/.*\/(t[0-9]+)-.*/\U\1/')
 
+  # ガード1: TASK_IDが正しい形式か検証（fail-closed）
+  if ! [[ "$TASK_ID" =~ ^T[0-9]+$ ]]; then
+    echo "⚠️ PR #$PR_NUM: TASK_ID parse failed from branch=$BRANCH → auto-merge SKIPPED"
+    continue
+  fi
+
   # plan.yamlからriskを取得
   RISK=$(yq ".tasks[] | select(.id == \"$TASK_ID\") | .risk" $PLAN)
+
+  # ガード2: RISKが取得できたか検証（fail-closed）
+  if [ -z "$RISK" ] || [ "$RISK" = "null" ]; then
+    echo "⚠️ PR #$PR_NUM ($TASK_ID): risk not found in plan → auto-merge SKIPPED"
+    continue
+  fi
 
   if [ "$RISK" = "high" ]; then
     echo "⚠️  PR #$PR_NUM ($TASK_ID): risk=high → auto-merge SKIPPED (手動レビュー必須)"
