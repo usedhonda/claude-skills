@@ -63,12 +63,18 @@ CLI⇄Web並列開発を自動化するBoris流ワークフロー。
 
 **High riskの例**: 認証/決済/データ削除/外部API連携/本番設定変更
 
+**運用ルール詳細**:
+- **medium**: 差分の目視確認 + 主要テスト通過 + 影響範囲がscope内であること
+- **high**: 最低1 approval必須、squashマージ固定、`/harvest`は`--auto`を実行しない
+
 ```yaml
 # plan.yaml でのrisk指定
 tasks:
   - id: T01
     risk: high  # → auto-merge対象外、手動レビュー必須
 ```
+
+> **実装**: `risk: high` のタスクに対して `/harvest` は `gh pr merge --auto` を実行しない
 
 ---
 
@@ -355,6 +361,20 @@ git push
 
 # 完了タスクを確認し、残りを再投入
 /dispatch --task T03 --task T04
+```
+
+### 6. リモート後始末（完全クリーンアップ）
+
+```bash
+# リモートブランチ削除
+git push origin --delete cc/xxx/t01-xxx
+
+# PRクローズ（必要時）
+gh pr close <PR番号>
+
+# ローカル掃除（最後に必ず実行）
+git worktree prune
+git branch -D cc/xxx/t01-xxx  # ローカルブランチ削除
 ```
 
 ---
