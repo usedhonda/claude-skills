@@ -1,0 +1,84 @@
+# Task Prompt Template
+#
+# Usage: Replace {placeholders} with actual values
+# Append " &" at the end to dispatch to Web (Boris式)
+
+{TASK_ID}: {TASK_TITLE}
+
+## Context
+
+Epic: {EPIC_DESCRIPTION}
+Branch: {BRANCH_NAME}
+Base: {BASE_BRANCH}
+
+## Scope
+
+Include:
+{SCOPE_INCLUDE}
+
+Exclude (DO NOT TOUCH):
+{SCOPE_EXCLUDE}
+
+## Done Criteria
+
+{DONE_CRITERIA}
+
+## Rules
+
+1. Do NOT modify files in exclude paths
+2. Keep changes focused (< 500 lines diff)
+3. Commit logically (1-3 commits)
+4. Run verification before PR:
+   {VERIFICATION_COMMANDS}
+5. Create PR when done:
+   ```
+   gh pr create --title "{TASK_ID}: {TASK_TITLE}" --body "Part of: {EPIC_DESCRIPTION}"
+   ```
+
+## Start
+
+Begin implementation now.
+
+---
+
+# Example (filled):
+#
+# T01: OAuth2プロバイダー追加
+#
+# ## Context
+#
+# Epic: 認証システムをOAuth2対応に
+# Branch: cc/20260105-1400/t01-oauth2
+# Base: main
+#
+# ## Scope
+#
+# Include:
+# - src/auth/providers/
+# - config/oauth.ts
+#
+# Exclude (DO NOT TOUCH):
+# - src/auth/session/
+# - src/auth/legacy/
+#
+# ## Done Criteria
+#
+# - GoogleログインがOAuth2で動作
+# - npm test -- auth/providers 通過
+# - Lint警告なし
+#
+# ## Rules
+#
+# 1. Do NOT modify files in exclude paths
+# 2. Keep changes focused (< 500 lines diff)
+# 3. Commit logically (1-3 commits)
+# 4. Run verification before PR:
+#    npm test && npm run lint
+# 5. Create PR when done:
+#    ```
+#    gh pr create --title "T01: OAuth2プロバイダー追加" --body "Part of: 認証システムをOAuth2対応に"
+#    ```
+#
+# ## Start
+#
+# Begin implementation now. &

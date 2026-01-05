@@ -1,0 +1,48 @@
+epic: "parallel-dev-orchestratorスキルのドキュメント・品質改善"
+base_branch: "main"
+timestamp: "20260105-1341"
+
+tasks:
+  - id: T01
+    title: "スキル用README.md追加"
+    branch: "cc/20260105-1341/t01-readme"
+    scope:
+      include:
+        - "skills/parallel-dev-orchestrator/README.md"
+      exclude:
+        - "skills/parallel-dev-orchestrator/SKILL.md"
+        - "skills/parallel-dev-orchestrator/references/"
+        - "skills/parallel-dev-orchestrator/commands/"
+        - "skills/parallel-dev-orchestrator/templates/"
+        - "agents/"
+    done:
+      - "README.mdが作成されている"
+      - "使い方、前提条件、クイックスタートが記載"
+    risk: low
+    dependencies: []
+
+  - id: T02
+    title: "ROADMAP.mdにv3.2.0追記"
+    branch: "cc/20260105-1341/t02-roadmap"
+    scope:
+      include:
+        - "docs/ROADMAP.md"
+      exclude:
+        - "skills/"
+        - "agents/"
+        - "commands/"
+    done:
+      - "v3.2.0の機能がROADMAPに記載"
+      - "parallel-dev-orchestratorの説明追加"
+    risk: low
+    dependencies: []
+
+merge_order: ["T01", "T02"]
+
+verification:
+  pre_merge: []
+
+notes: |
+  - T01とT02は完全に独立しており並列実行可能
+  - scope.excludeで相互に分離済み
+  - 小さな変更なのでriskは両方low
