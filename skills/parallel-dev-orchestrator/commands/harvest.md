@@ -55,16 +55,32 @@ gh pr list --search "cc/$TIMESTAMP" \
   --json number,title,state,headRefName,url,mergeable,statusCheckRollup
 ```
 
-### 2. Auto-merge有効化
+### 2. Auto-merge有効化（Risk Policy対応）
 
 ```bash
-for pr in $(gh pr list --search "cc/$TIMESTAMP" --json number -q '.[].number'); do
-  # auto-merge有効化
-  gh pr merge $pr --auto --squash --delete-branch
+# plan.yamlからtasks情報を取得
+TASKS=$(yq '.tasks' $PLAN)
 
-  echo "Auto-merge enabled for PR #$pr"
+for pr in $(gh pr list --search "cc/$TIMESTAMP" --json number,headRefName -q '.[] | "\(.number):\(.headRefName)"'); do
+  PR_NUM=$(echo $pr | cut -d: -f1)
+  BRANCH=$(echo $pr | cut -d: -f2)
+
+  # ブランチ名からタスクIDを抽出（例: cc/20260105-1400/t01-oauth → T01）
+  TASK_ID=$(echo $BRANCH | sed -E 's/.*\/(t[0-9]+)-.*/\U\1/')
+
+  # plan.yamlからriskを取得
+  RISK=$(yq ".tasks[] | select(.id == \"$TASK_ID\") | .risk" $PLAN)
+
+  if [ "$RISK" = "high" ]; then
+    echo "⚠️  PR #$PR_NUM ($TASK_ID): risk=high → auto-merge SKIPPED (手動レビュー必須)"
+  else
+    gh pr merge $PR_NUM --auto --squash --delete-branch
+    echo "✅ PR #$PR_NUM ($TASK_ID): auto-merge enabled (risk=$RISK)"
+  fi
 done
 ```
+
+> **Risk Policy**: `risk: high` のタスクは auto-merge 対象外。手動レビュー・承認後にマージしてください。
 
 ### 3. 完了待機（--watch時）
 

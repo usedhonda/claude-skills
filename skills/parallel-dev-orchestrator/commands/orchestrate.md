@@ -116,9 +116,11 @@ echo "cd .worktrees/{task-id} && claude"
 # PR一覧取得
 gh pr list --search "cc/{timestamp}" --json number,title,state,url
 
-# 各PRについてauto-merge有効化
-gh pr merge {number} --auto --squash --delete-branch
+# Risk Policyに従ってauto-merge（/harvest に委譲）
+/harvest --plan reports/plan-{timestamp}.yaml
 ```
+
+> **Risk Policy**: `risk: high` タスクは auto-merge 対象外（手動レビュー必須）
 
 ### Phase 5: Harvest
 
