@@ -92,15 +92,17 @@ Long contexts lose focus in the middle. We anchor critical decisions at the edge
 
 Or say: "create skills from history", "analyze patterns"
 
-### [parallel-dev-orchestrator](skills/parallel-dev-orchestrator/SKILL.md) `v3.2.0`
+### [parallel-dev-orchestrator](skills/parallel-dev-orchestrator/SKILL.md) `v3.3.1`
 
 > **Boris-style CLI⇄Web Parallel Development** - Orchestrate multiple Claude Code sessions.
 
 **Key Features:**
 - Task decomposition with worktree-dispatcher agent
 - Multiple dispatch methods (& experimental, worktree, manual web)
-- Auto-merge via `gh pr merge --auto`
-- Progress monitoring and report generation
+- Auto-merge via `gh pr merge --auto` with Risk Policy
+- When NOT to Use guidance (anti-patterns)
+- Recovery Playbook for common failures
+- Fail-closed guards for safety
 
 **Quick Start:**
 ```bash
@@ -241,15 +243,17 @@ MIT License - see [LICENSE](LICENSE)
 
 または「履歴からスキル作成」「パターン分析」と入力
 
-### [parallel-dev-orchestrator](skills/parallel-dev-orchestrator/SKILL.md) `v3.2.0`
+### [parallel-dev-orchestrator](skills/parallel-dev-orchestrator/SKILL.md) `v3.3.1`
 
 > **Boris流CLI⇄Web並列開発** - 複数のClaude Codeセッションをオーケストレート。
 
 **主な機能:**
 - worktree-dispatcherエージェントによるタスク分解
 - 複数のdispatch方式（&試験的、worktree、手動web）
-- `gh pr merge --auto`による自動マージ
-- 進捗監視とレポート生成
+- Risk Policyに基づく`gh pr merge --auto`
+- When NOT to Useガイド（アンチパターン）
+- Recovery Playbook（障害対応手順）
+- Fail-closedガード（安全装置）
 
 **クイックスタート:**
 ```bash
