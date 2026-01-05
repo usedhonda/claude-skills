@@ -1,6 +1,6 @@
 ---
 description: Boris流CLI⇄Web並列開発のフルワークフロー実行
-argument-hint: [epic説明] or [--resume]
+argument-hint: [epic説明] or [--resume] or [--from-plan]
 ---
 
 # Orchestrate Parallel Development
@@ -34,11 +34,22 @@ Plan → Dispatch → Monitor → Harvest の全フェーズを実行。
 /orchestrate --resume
 ```
 
+### plan-parallel から実行
+
+```
+/orchestrate --from-plan
+```
+
+`/plan-parallel` で作成した計画ファイル（`.claude/plans/*.md`）から
+YAMLブロックを抽出し、`reports/plan-{timestamp}.yaml` に保存して実行。
+
 ---
 
 ## 実行フロー
 
 ### Phase 1: Plan
+
+#### 通常実行の場合
 
 **worktree-dispatcher** エージェントを使ってタスク分解:
 
@@ -46,6 +57,24 @@ Plan → Dispatch → Monitor → Harvest の全フェーズを実行。
 2. 2-5個のタスクに分解
 3. 各タスクのscope（include/exclude）を決定
 4. `reports/plan-{timestamp}.yaml` に保存
+
+#### --from-plan の場合
+
+`/plan-parallel` で作成済みの計画を使用:
+
+```bash
+# 最新の計画ファイルを取得
+PLAN_FILE=$(ls -t .claude/plans/*.md | head -1)
+
+# YAMLブロックを抽出
+YAML=$(sed -n '/^```yaml/,/^```/p' "$PLAN_FILE" | sed '1d;$d')
+
+# reports/plan-{timestamp}.yaml に保存
+TIMESTAMP=$(date '+%Y%m%d-%H%M')
+echo "$YAML" > "reports/plan-$TIMESTAMP.yaml"
+```
+
+→ Phase 2 (Branch Setup) へスキップ
 
 **出力形式**:
 
@@ -169,5 +198,6 @@ gh api repos/{owner}/{repo} --jq '.allow_auto_merge'
 
 ## 関連コマンド
 
+- `/plan-parallel` - 並列開発前提の計画モード
 - `/dispatch` - タスク投入のみ
 - `/harvest` - PR収集・レポートのみ
