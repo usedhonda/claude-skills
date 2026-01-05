@@ -18,7 +18,7 @@ CLI⇄Web並列開発を自動化するBoris流ワークフロー。
 
 ## TL;DR
 
-1. **Plan**: epicをタスク分解 → `reports/plan.yaml`
+1. **Plan**: epicをタスク分解 → `reports/plan-{timestamp}.yaml`
 2. **Dispatch**: 各タスクをWeb or worktreeに投入
 3. **Harvest**: PR監視 → auto-merge → レポート生成
 
@@ -31,6 +31,44 @@ CLI⇄Web並列開発を自動化するBoris流ワークフロー。
 - Claude Code Webも活用して開発速度を上げたい
 
 **Trigger phrases**: `/orchestrate`, `並列開発`, `タスク分解`, `parallel tasks`
+
+---
+
+## When NOT to Use
+
+このスキルは強力だが、以下のケースでは**使わない方が良い**：
+
+| ケース | 理由 | 代替案 |
+|--------|------|--------|
+| 大規模リネーム/リファクタ | 複数ブランチで同一ファイルを触る | 単一ブランチで実行 |
+| 広域の設計変更 | scope分離が困難 | 先に設計PRを1つ作成 |
+| DBマイグレーション | 実行順序が厳密 | 依存順に直列実行 |
+| 同一ファイル集合を触るタスク | コンフリクト確定 | タスクを再分割 |
+| 依存が鎖状に長いepic | 並列化の利点がない | 依存順に直列実行 |
+| 初めてのリポジトリ | 構造理解が先 | 単一タスクで試行 |
+
+**判断基準**: scope.excludeで明確に分離できないなら、並列化しない。
+
+---
+
+## Risk Policy
+
+タスクの `risk` レベルに応じた運用ルール：
+
+| Risk | auto-merge | 必須条件 | 推奨アクション |
+|------|------------|----------|----------------|
+| **low** | ✅ 許可 | CI通過 | `--watch` で監視 |
+| **medium** | ✅ 許可 | CI通過 + required checks | PR内容を軽く確認 |
+| **high** | ❌ 禁止 | 手動レビュー必須 | `/harvest --report-only` で状況確認後、手動マージ |
+
+**High riskの例**: 認証/決済/データ削除/外部API連携/本番設定変更
+
+```yaml
+# plan.yaml でのrisk指定
+tasks:
+  - id: T01
+    risk: high  # → auto-merge対象外、手動レビュー必須
+```
 
 ---
 
@@ -60,6 +98,17 @@ Settings → Branches → Add branch protection rule
 ```bash
 gh auth login
 gh auth status  # 確認
+```
+
+### 4. 必須ツール
+
+```bash
+# yq (YAML処理)
+brew install yq  # macOS
+# または: pip install yq
+
+# jq (JSON処理)
+brew install jq  # macOS
 ```
 
 詳細: [references/github-setup.md](references/github-setup.md)
@@ -241,6 +290,84 @@ verification:
 | scope重複のまま並列実行 | Critical | コンフリクト確定 [E2] |
 | 大きすぎるタスク（>500行） | Warning | レビュー困難 [E3] |
 | テストなしでマージ | Warning | 品質低下 [E3] |
+
+---
+
+## Recovery Playbook
+
+問題発生時の標準手順：
+
+### 1. Dispatch失敗
+
+```bash
+# 状態確認
+git worktree list
+gh pr list --state open
+
+# リカバリ
+git worktree remove .worktrees/t01  # 問題のworktree削除
+git branch -D cc/xxx/t01-xxx        # ブランチ削除
+# → 再度 /dispatch --task T01
+```
+
+### 2. PRがコンフリクト
+
+```bash
+# mainを取り込んで解決
+cd .worktrees/t01
+git fetch origin main
+git rebase origin/main
+# コンフリクト解決後
+git push --force-with-lease
+```
+
+### 3. CIが落ちる
+
+```bash
+# ログ確認
+gh pr checks <PR番号>
+
+# 修正してpush
+cd .worktrees/t01
+# 修正作業...
+git add . && git commit -m "fix: CI error"
+git push
+```
+
+### 4. scope逸脱（exclude触った）
+
+```bash
+# 差分確認
+cd .worktrees/t01
+git diff --name-only origin/main
+
+# 該当ファイルをrevert
+git checkout origin/main -- path/to/excluded/file
+git commit -m "revert: remove out-of-scope changes"
+git push
+```
+
+### 5. 中断→再開
+
+```bash
+# 現状確認
+/harvest --report-only
+
+# 完了タスクを確認し、残りを再投入
+/dispatch --task T03 --task T04
+```
+
+---
+
+## Artifacts
+
+このスキルが生成するファイル：
+
+| ファイル | 説明 | 生成タイミング |
+|----------|------|----------------|
+| `reports/plan-{timestamp}.yaml` | タスク分解結果 | /orchestrate Phase 1 |
+| `.worktrees/t{N}/` | 並列作業ディレクトリ | /dispatch (worktree方式) |
+| `reports/{timestamp}-report.md` | 完了レポート | /harvest |
 
 ---
 
