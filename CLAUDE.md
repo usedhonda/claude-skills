@@ -2,36 +2,52 @@
 
 Claude Code plugin marketplace for project-specific skills.
 
-## Critical: Command Placement Rules
+## Command Structure (v4.0.0)
 
-**Root Problem**: Multiple plugins with `source: "./"` load ALL commands, causing duplication.
+### Unified Entry Points
 
-### Rule 1: One Location Only
-
-| Command Type | Location | Example |
-|--------------|----------|---------|
-| **Shared** (used by ALL skills) | `commands/` | gen-all, gen-agents, gen-skills |
-| **Skill-specific** | `skills/{name}/commands/` | skill-eval, orchestrate, dispatch |
-
-**NEVER place the same command in both locations.**
-
-### Rule 2: Current Command Map
+All commands are now consolidated into two unified entry points:
 
 ```
-commands/                              # Shared (meta-generation)
-├── gen-all.md
-├── gen-agents.md
-└── gen-skills.md
+commands/
+├── cs-learn-skills.md    # Knowledge management
+└── cs-run-parallel.md    # Parallel development
+```
 
-skills/skill-from-history/commands/    # skill-from-history only
-├── skill-eval.md
-└── skill-promote.md
+### /cs-learn-skills
 
-skills/parallel-dev-orchestrator/commands/  # parallel-dev-orchestrator only
-├── orchestrate.md
-├── dispatch.md
-├── harvest.md
-└── plan-parallel.md
+```
+/cs-learn-skills [subcommand]
+├─ init     : Golden Tasks 雛形生成
+├─ gen      : agents/skills 生成
+├─ check    : 評価実行
+├─ promote  : 成熟度昇格
+└─ status   : 現在状態表示
+```
+
+### /cs-run-parallel
+
+```
+/cs-run-parallel [subcommand]
+├─ init     : 環境診断（gh, yq, jq）
+├─ plan     : タスク計画作成
+├─ dispatch : タスク投入
+├─ harvest  : PR収集・マージ
+└─ status   : PR状態表示
+```
+
+### Quick Start
+
+```bash
+# Knowledge Management
+/cs-learn-skills status    # Check current state
+/cs-learn-skills init      # Setup Golden Tasks
+/cs-learn-skills gen       # Generate skills
+
+# Parallel Development
+/cs-run-parallel init      # Check prerequisites
+/cs-run-parallel plan      # Create task plan
+/cs-run-parallel dispatch  # Submit tasks
 ```
 
 ---
@@ -90,12 +106,11 @@ Usage and documentation...
 {
   "skills": [
     { "name": "{skill-name}", "path": "skills/{skill-name}" }
-  ],
-  "commands": [
-    "./skills/{skill-name}/commands/"
   ]
 }
 ```
+
+**Note**: Commands are now unified in `commands/`. Add subcommands to existing entry points instead of creating new command files.
 
 ### 5. Update marketplace.json
 
@@ -204,11 +219,12 @@ grep -r "skills:" agents/*/AGENT.md
 # Verify settings.json
 cat .claude-plugin/settings.json | jq '.commands'
 
-# Check for duplicates
-for cmd in plan-parallel orchestrate dispatch harvest; do
-  echo "=== $cmd ==="
-  find . -name "${cmd}.md" -type f
-done
+# List unified commands
+ls -la commands/
+
+# Test commands
+/cs-learn-skills status
+/cs-run-parallel status
 ```
 
 ---
@@ -219,7 +235,7 @@ done
 
 ```bash
 # 1. Create structure
-mkdir -p skills/{name}/commands skills/{name}/references
+mkdir -p skills/{name}/references
 
 # 2. Create SKILL.md
 cat > skills/{name}/SKILL.md << 'EOF'
@@ -235,31 +251,22 @@ compression-anchors:
 Content...
 EOF
 
-# 3. Update settings.json (add to skills[] and commands[])
+# 3. Update settings.json (add to skills[])
 # 4. Update marketplace.json (add to plugins[])
-# 5. Bump version in both files
-# 6. Run pre-release checklist
+# 5. Add subcommands to existing entry points (cs-learn-skills or cs-run-parallel)
+# 6. Bump version in both files
 ```
 
-### Add a Command to Existing Skill
+### Add a Subcommand
 
 ```bash
-# 1. Create command file
-cat > skills/{skill-name}/commands/{command}.md << 'EOF'
----
-description: Brief description
-argument-hint: [optional args]
----
+# Edit existing unified command file
+# commands/cs-learn-skills.md or commands/cs-run-parallel.md
 
-# Command Name
-
-Documentation...
-EOF
-
-# 2. Verify no duplication in root commands/
-ls commands/{command}.md 2>/dev/null && echo "ERROR: Duplicate exists!"
-
-# 3. Bump patch version
+# Add new subcommand section following existing pattern:
+# - Update Usage section
+# - Add Subcommand documentation
+# - Update Quick Start if needed
 ```
 
 ---
@@ -271,3 +278,4 @@ ls commands/{command}.md 2>/dev/null && echo "ERROR: Duplicate exists!"
 | Commands duplicated across plugins | 2b7f647 | Remove from root `commands/` |
 | Commands in wrong namespace | f240516 | Restore to skill-specific paths |
 | Plugin source overlap | - | All use `source: "./"` - commands must be in ONE location |
+| Command fragmentation (v4.0.0) | - | Unified into `/cs-learn-skills` and `/cs-run-parallel` |

@@ -5,7 +5,7 @@
   },
   "metadata": {
     "description": "A collection of Claude Code skills for enhanced development workflows",
-    "version": "3.5.0"
+    "version": "4.0.0"
   },
   "plugins": [
     {
