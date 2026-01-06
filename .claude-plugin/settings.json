@@ -1,6 +1,6 @@
 {
   "name": "claude-skills",
-  "version": "3.4.0",
+  "version": "3.4.1",
   "description": "A collection of Claude Code skills for enhanced development workflows",
   "skills": [
     {
@@ -19,9 +19,7 @@
     }
   ],
   "commands": [
-    "./commands/",
-    "./skills/skill-from-history/commands/",
-    "./skills/parallel-dev-orchestrator/commands/"
+    "./commands/"
   ],
   "repository": "https://github.com/usedhonda/claude-skills"
 }
