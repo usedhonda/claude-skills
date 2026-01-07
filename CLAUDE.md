@@ -2,52 +2,60 @@
 
 Claude Code plugin marketplace for project-specific skills.
 
-## Command Structure (v4.0.0)
+## Command Structure (v4.1.0)
 
-### Unified Entry Points
+### Plugin-Specific Commands
 
-All commands are now consolidated into two unified entry points:
-
-```
-commands/
-├── cs-learn-skills.md    # Knowledge management
-└── cs-run-parallel.md    # Parallel development
-```
-
-### /cs-learn-skills
+Each plugin has its own command namespace to avoid duplication:
 
 ```
-/cs-learn-skills [subcommand]
-├─ init     : Golden Tasks 雛形生成
-├─ gen      : agents/skills 生成
-├─ check    : 評価実行
-├─ promote  : 成熟度昇格
-└─ status   : 現在状態表示
+skills/skill-from-history/commands/
+├── learn-status.md
+├── learn-init.md
+├── learn-gen.md
+├── learn-check.md
+└── learn-promote.md
+
+skills/parallel-dev-orchestrator/commands/
+├── par-status.md
+├── par-init.md
+├── par-plan.md
+├── par-dispatch.md
+└── par-harvest.md
 ```
 
-### /cs-run-parallel
+### skill-from-history Commands
 
 ```
-/cs-run-parallel [subcommand]
-├─ init     : 環境診断（gh, yq, jq）
-├─ plan     : タスク計画作成
-├─ dispatch : タスク投入
-├─ harvest  : PR収集・マージ
-└─ status   : PR状態表示
+/skill-from-history:learn-status   # Show current status
+/skill-from-history:learn-init     # Initialize Golden Tasks
+/skill-from-history:learn-gen      # Generate agents/skills
+/skill-from-history:learn-check    # Run evaluation
+/skill-from-history:learn-promote  # Promote maturity level
+```
+
+### parallel-dev-orchestrator Commands
+
+```
+/parallel-dev-orchestrator:par-status   # Show PR status
+/parallel-dev-orchestrator:par-init     # Check environment
+/parallel-dev-orchestrator:par-plan     # Create task plan
+/parallel-dev-orchestrator:par-dispatch # Dispatch tasks
+/parallel-dev-orchestrator:par-harvest  # Harvest and merge PRs
 ```
 
 ### Quick Start
 
 ```bash
 # Knowledge Management
-/cs-learn-skills status    # Check current state
-/cs-learn-skills init      # Setup Golden Tasks
-/cs-learn-skills gen       # Generate skills
+/skill-from-history:learn-status    # Check current state
+/skill-from-history:learn-init      # Setup Golden Tasks
+/skill-from-history:learn-gen       # Generate skills
 
 # Parallel Development
-/cs-run-parallel init      # Check prerequisites
-/cs-run-parallel plan      # Create task plan
-/cs-run-parallel dispatch  # Submit tasks
+/parallel-dev-orchestrator:par-init      # Check prerequisites
+/parallel-dev-orchestrator:par-plan      # Create task plan
+/parallel-dev-orchestrator:par-dispatch  # Submit tasks
 ```
 
 ---
@@ -110,7 +118,7 @@ Usage and documentation...
 }
 ```
 
-**Note**: Commands are now unified in `commands/`. Add subcommands to existing entry points instead of creating new command files.
+**Note**: Each skill has its own `commands/` directory. Commands use prefixes (`learn-*`, `par-*`) to indicate which skill they belong to.
 
 ### 5. Update marketplace.json
 
@@ -219,12 +227,12 @@ grep -r "skills:" agents/*/AGENT.md
 # Verify settings.json
 cat .claude-plugin/settings.json | jq '.commands'
 
-# List unified commands
-ls -la commands/
+# List skill-specific commands
+ls -la skills/*/commands/
 
 # Test commands
-/cs-learn-skills status
-/cs-run-parallel status
+/skill-from-history:learn-status
+/parallel-dev-orchestrator:par-status
 ```
 
 ---
@@ -251,22 +259,29 @@ compression-anchors:
 Content...
 EOF
 
-# 3. Update settings.json (add to skills[])
-# 4. Update marketplace.json (add to plugins[])
-# 5. Add subcommands to existing entry points (cs-learn-skills or cs-run-parallel)
+# 3. Create commands/ directory with {prefix}-*.md files
+# 4. Update settings.json (add to skills[], commands[])
+# 5. Update marketplace.json (add to plugins[])
 # 6. Bump version in both files
 ```
 
-### Add a Subcommand
+### Add a Command to Existing Skill
 
 ```bash
-# Edit existing unified command file
-# commands/cs-learn-skills.md or commands/cs-run-parallel.md
+# Create new command file in skill's commands/ directory
+# skills/{skill-name}/commands/{prefix}-{action}.md
 
-# Add new subcommand section following existing pattern:
-# - Update Usage section
-# - Add Subcommand documentation
-# - Update Quick Start if needed
+# Example: Add learn-export to skill-from-history
+cat > skills/skill-from-history/commands/learn-export.md << 'EOF'
+---
+description: Export skills to external format
+argument-hint: [--format json|yaml]
+---
+
+# learn-export
+
+Documentation...
+EOF
 ```
 
 ---
@@ -279,3 +294,4 @@ EOF
 | Commands in wrong namespace | f240516 | Restore to skill-specific paths |
 | Plugin source overlap | - | All use `source: "./"` - commands must be in ONE location |
 | Command fragmentation (v4.0.0) | - | Unified into `/cs-learn-skills` and `/cs-run-parallel` |
+| Command duplication (v4.1.0) | - | Split to plugin-specific: `learn-*` / `par-*` |
