@@ -133,7 +133,7 @@ Usage and documentation...
       "source": "./",
       "skills": ["./skills/{skill-name}"],
       "commands": ["./skills/{skill-name}/commands/"],
-      "agents": ["./agents/{agent-name}"]
+      "agents": ["./agents/{agent-name}/AGENT.md"]
     }
   ]
 }
@@ -146,7 +146,7 @@ Usage and documentation...
 | `source` | ✅ | Always `"./"` |
 | `skills` | ✅ | Path to SKILL.md directory |
 | `commands` | ✅ | Path to commands/ directory (empty array `[]` if none) |
-| `agents` | ✅ | Path to agent directories (empty array `[]` if none) |
+| `agents` | ✅ | **Must end with `.md`** (e.g., `./agents/name/AGENT.md`) |
 
 ### 6. Bump Version
 
@@ -338,3 +338,4 @@ EOF
 | Command fragmentation (v4.0.0) | - | Unified into `/cs-learn-skills` and `/cs-run-parallel` |
 | Command duplication (v4.1.0) | - | Split to plugin-specific: `learn-*` / `par-*` |
 | **marketplace.json missing commands/agents** | 33d2fef | Add `commands` and `agents` fields to each plugin (v4.2.0) |
+| **agents path must end with .md** | - | Use `./agents/name/AGENT.md` not `./agents/name` (v4.2.1) |

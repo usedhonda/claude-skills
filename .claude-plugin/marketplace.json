@@ -5,7 +5,7 @@
   },
   "metadata": {
     "description": "A collection of Claude Code skills for enhanced development workflows",
-    "version": "4.2.0"
+    "version": "4.2.1"
   },
   "plugins": [
     {
@@ -31,7 +31,7 @@
         "./skills/parallel-dev-orchestrator/commands/"
       ],
       "agents": [
-        "./agents/worktree-dispatcher"
+        "./agents/worktree-dispatcher/AGENT.md"
       ]
     }
   ]
