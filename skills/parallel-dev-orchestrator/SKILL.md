@@ -18,9 +18,17 @@ CLI⇄Web並列開発を自動化するBoris流ワークフロー。
 
 ## TL;DR
 
-1. **Plan**: epicをタスク分解 → `reports/plan-{timestamp}.yaml`
-2. **Dispatch**: 各タスクをWeb or worktreeに投入
-3. **Harvest**: PR監視 → auto-merge → レポート生成
+```
+/par-plan "ゴール" → 計画確認 → ブランチ自動作成 → Webプロンプト表示
+                                        ↓
+                              claude.ai/code に貼り付けて実行
+                                        ↓
+                              /par-harvest でPR収穫
+```
+
+1. **Plan**: ゴールをタスク分解 → 確認 → ブランチ作成 → プロンプト生成
+2. **Execute**: Webセッションでプロンプトを実行（並列可）
+3. **Harvest**: PRをマージ → レポート生成
 
 ---
 
@@ -44,7 +52,7 @@ CLI⇄Web並列開発を自動化するBoris流ワークフロー。
 | 広域の設計変更 | scope分離が困難 | 先に設計PRを1つ作成 |
 | DBマイグレーション | 実行順序が厳密 | 依存順に直列実行 |
 | 同一ファイル集合を触るタスク | コンフリクト確定 | タスクを再分割 |
-| 依存が鎖状に長いepic | 並列化の利点がない | 依存順に直列実行 |
+| 依存が鎖状に長いゴール | 並列化の利点がない | 依存順に直列実行 |
 | 初めてのリポジトリ | 構造理解が先 | 単一タスクで試行 |
 
 **判断基準**: scope.excludeで明確に分離できないなら、並列化しない。
@@ -130,44 +138,37 @@ brew install jq  # macOS
                           │
                           ▼
 ┌─────────────────────────────────────────────────────────┐
-│  Phase 1: Plan (worktree-dispatcher)                    │
+│  Phase 1: Analyze & Confirm                             │
 │  ─────────────────────────────────────                  │
-│  epicを分析 → タスクカード生成                            │
+│  ゴールを分析 → タスク分解 → 計画表示                      │
+│  「この計画で進めますか?」→ ユーザー確認                   │
 │  → reports/plan-20260105-1400.yaml                      │
 └─────────────────────────────────────────────────────────┘
                           │
                           ▼
 ┌─────────────────────────────────────────────────────────┐
-│  Phase 2: Branch Setup                                  │
+│  Phase 2: Auto Branch Setup (Claude実行)                │
 │  ─────────────────────────────────────                  │
-│  各タスク用ブランチを作成・push                           │
+│  承認後、Claudeが自動でブランチ作成・push                  │
 │  cc/20260105-1400/t01-oauth2-provider                   │
 │  cc/20260105-1400/t02-session-redis                     │
 └─────────────────────────────────────────────────────────┘
                           │
                           ▼
 ┌─────────────────────────────────────────────────────────┐
-│  Phase 3: Dispatch                                      │
+│  Phase 3: Prompt Generation                             │
 │  ─────────────────────────────────────                  │
-│  [優先] & でWebに投入                                    │
-│  [代替] worktreeで並列CLI起動                            │
-│  [手動] claude.ai/code に貼り付け                        │
+│  各タスク用Webプロンプトを自動生成・表示                   │
+│  → claude.ai/code に貼り付けて実行                       │
 └─────────────────────────────────────────────────────────┘
                           │
                           ▼
 ┌─────────────────────────────────────────────────────────┐
-│  Phase 4: Monitor & Auto-merge                          │
+│  Phase 4: Harvest                                       │
 │  ─────────────────────────────────────                  │
-│  gh pr list でPR監視                                    │
-│  gh pr merge --auto でマージ有効化                       │
-└─────────────────────────────────────────────────────────┘
-                          │
-                          ▼
-┌─────────────────────────────────────────────────────────┐
-│  Phase 5: Harvest                                       │
-│  ─────────────────────────────────────                  │
-│  全PRマージ完了を検知                                    │
-│  → reports/20260105-1400-report.md                      │
+│  /par-harvest でPR収穫                                   │
+│  auto-merge有効化 → レポート生成                         │
+│  → reports/harvest-20260105-1400.md                     │
 └─────────────────────────────────────────────────────────┘
 ```
 
@@ -181,18 +182,21 @@ brew install jq  # macOS
 /parallel-dev-orchestrator:par-init
 ```
 
-### 2. タスク分解
+### 2. 計画作成 → ブランチ作成 → プロンプト生成
 
 ```bash
 /parallel-dev-orchestrator:par-plan "ユーザー認証をOAuth2対応にする"
 ```
 
-### 3. 並列投入
+実行すると:
+1. タスク分解・計画表示
+2. 「この計画で進めますか?」確認
+3. ブランチ自動作成・push
+4. Webプロンプト表示
 
-```bash
-/parallel-dev-orchestrator:par-dispatch
-/parallel-dev-orchestrator:par-dispatch --task T01  # 特定タスクのみ
-```
+### 3. Web実行
+
+表示されたプロンプトを claude.ai/code に貼り付けて実行。
 
 ### 4. PRマージ
 
@@ -200,52 +204,56 @@ brew install jq  # macOS
 /parallel-dev-orchestrator:par-harvest --watch  # 監視モードでマージ待ち
 ```
 
+### Alternative: Worktree方式
+
+CLIで並列実行したい場合:
+
+```bash
+/parallel-dev-orchestrator:par-dispatch              # 全タスク
+/parallel-dev-orchestrator:par-dispatch --task T01   # 特定タスクのみ
+```
+
 ---
 
 ## Dispatch Methods
 
-### 方式1: & でWeb投入（Boris式・推奨）
+### 方式1: Web実行（推奨）
+
+`/par-plan` で自動生成されるプロンプトを claude.ai/code に貼り付け:
 
 ```
 T01: OAuth2プロバイダー追加
 
-Branch: cc/20260105-1400/t01-oauth2
-Base: main
+リポジトリ: myapp
+ブランチ: cc/20260105-1400/t01-oauth2
 
-Scope:
-- include: src/auth/, config/oauth.ts
-- exclude: src/auth/legacy/
+## タスク
+OAuth2プロバイダー(Google)を追加
 
-Done:
+## Scope
+触ってよい: src/auth/, config/oauth.ts
+触らない: src/auth/legacy/
+
+## Done
 - OAuth2ログインがGoogle対応
 - テスト通過: npm test -- auth
 
-Rules:
-- excludeパスは触らない
-- PR作成時: "T01: OAuth2プロバイダー追加"
-
-Start now. &
+完了後: git add/commit/push → gh pr create
 ```
 
-> **注意**: `&` は公式ドキュメント未記載。動作しない場合は方式2へ
-
-### 方式2: Git Worktree（確実）
+### 方式2: Git Worktree（CLI並列実行）
 
 ```bash
-# worktree作成
-git worktree add .worktrees/t01 cc/20260105-1400/t01-oauth2
+/parallel-dev-orchestrator:par-dispatch
 
-# 別ターミナルで
-cd .worktrees/t01
-claude  # タスクプロンプトを貼り付け
+# 出力例:
+# .worktrees/t01/ (branch: cc/xxx/t01-oauth2)
+# .worktrees/t02/ (branch: cc/xxx/t02-redis)
+#
+# 別ターミナルで:
+#   cd .worktrees/t01 && claude
+#   cd .worktrees/t02 && claude
 ```
-
-### 方式3: 手動Web投入
-
-1. claude.ai/code を開く
-2. リポジトリを選択
-3. タスクプロンプトを貼り付け
-4. ブランチ指定して実行
 
 詳細: [references/dispatch-methods.md](references/dispatch-methods.md)
 
@@ -254,7 +262,7 @@ claude  # タスクプロンプトを貼り付け
 ## Task Card Format
 
 ```yaml
-epic: "機能説明"
+goal: "機能説明"
 base_branch: "main"
 timestamp: "20260105-1400"
 tasks:
