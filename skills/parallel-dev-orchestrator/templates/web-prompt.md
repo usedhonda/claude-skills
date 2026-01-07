@@ -12,7 +12,6 @@ Webセッション用プロンプトのテンプレート。`par-plan`で自動�
 ━━━━━━━━━━ ✂ COPY START ✂ ━━━━━━━━━━
 
 Repository: {repo_name}
-Branch: {branch_name}
 
 {task_description}
 
@@ -23,9 +22,9 @@ Scope:
 Done when:
 {done_criteria}
 
-Create PR when done.
-
 ━━━━━━━━━━ ✂ COPY END ✂ ━━━━━━━━━━
+
+⚠️ After completion: Click "Create PR" button / 完了後: PRボタンをクリック
 ```
 
 ## Example
@@ -38,7 +37,6 @@ Create PR when done.
 ━━━━━━━━━━ ✂ COPY START ✂ ━━━━━━━━━━
 
 Repository: myapp
-Branch: cc/20260107-1500/t01-oauth2
 
 Add OAuth2 provider (Google).
 
@@ -50,7 +48,7 @@ Done when:
 - Google login works with OAuth2
 - npm test -- auth/providers passes
 
-Create PR when done.
-
 ━━━━━━━━━━ ✂ COPY END ✂ ━━━━━━━━━━
+
+⚠️ After completion: Click "Create PR" button / 完了後: PRボタンをクリック
 ```

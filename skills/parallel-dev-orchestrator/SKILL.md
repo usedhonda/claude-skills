@@ -147,19 +147,18 @@ brew install jq  # macOS
                           │
                           ▼
 ┌─────────────────────────────────────────────────────────┐
-│  Phase 2: Auto Branch Setup (Claude実行)                │
+│  Phase 2: Prompt Generation                             │
 │  ─────────────────────────────────────                  │
-│  承認後、Claudeが自動でブランチ作成・push                  │
-│  cc/20260105-1400/t01-oauth2-provider                   │
-│  cc/20260105-1400/t02-session-redis                     │
+│  各タスク用Webプロンプトを自動生成・表示                   │
+│  → claude.ai/code に貼り付けて実行                       │
 └─────────────────────────────────────────────────────────┘
                           │
                           ▼
 ┌─────────────────────────────────────────────────────────┐
-│  Phase 3: Prompt Generation                             │
+│  Phase 3: Web Execution                                 │
 │  ─────────────────────────────────────                  │
-│  各タスク用Webプロンプトを自動生成・表示                   │
-│  → claude.ai/code に貼り付けて実行                       │
+│  Claude Web: ブランチ作成 → 作業 → commit → push         │
+│  ユーザー: PRボタンをクリック                             │
 └─────────────────────────────────────────────────────────┘
                           │
                           ▼
@@ -229,7 +228,6 @@ CLIで並列実行したい場合:
 ━━━━━━━━━━ ✂ COPY START ✂ ━━━━━━━━━━
 
 Repository: myapp
-Branch: cc/20260105-1400/t01-oauth2
 
 Add OAuth2 provider (Google).
 
@@ -241,9 +239,9 @@ Done when:
 - Google login works with OAuth2
 - npm test -- auth passes
 
-Create PR when done.
-
 ━━━━━━━━━━ ✂ COPY END ✂ ━━━━━━━━━━
+
+⚠️ After completion: Click "Create PR" button / 完了後: PRボタンをクリック
 ```
 
 ### 方式2: Git Worktree（CLI並列実行）
@@ -273,7 +271,6 @@ timestamp: "20260105-1400"
 tasks:
   - id: T01
     title: "OAuth2プロバイダー追加"
-    branch: "cc/20260105-1400/t01-oauth2"
     scope:
       include: ["src/auth/", "config/oauth.ts"]
       exclude: ["src/auth/legacy/"]
@@ -284,7 +281,6 @@ tasks:
     dependencies: []
   - id: T02
     title: "セッションRedis移行"
-    branch: "cc/20260105-1400/t02-redis"
     scope:
       include: ["src/session/"]
       exclude: ["src/auth/"]

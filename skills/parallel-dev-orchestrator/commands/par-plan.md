@@ -5,7 +5,7 @@ argument-hint: "goal description"
 
 # par-plan
 
-ゴールをタスクに分解し、ブランチ作成からWebプロンプト生成まで実行。
+ゴールをタスクに分解し、Webプロンプトを生成。
 
 ## Usage
 
@@ -43,47 +43,32 @@ Tasks: 3
 
 ユーザーが承認したら次へ。修正点があれば反映。
 
-### Step 3: Create Branches
+### Step 3: Generate Web Prompts
 
-**Claudeが自動実行:**
-
-```bash
-git checkout -b cc/{timestamp}/t01-xxx
-git push -u origin cc/{timestamp}/t01-xxx
-git checkout main
-# 全タスク分繰り返し
-```
-
-### Step 4: Generate Web Prompts
-
-各タスク用のWebセッションプロンプトを生成・表示:
+各タスク用のWebプロンプトを生成・表示:
 
 ```
-## Web Session Prompts
+# Session 1: T01
 
-以下を claude.ai/code の各セッションに貼り付けてください:
+**Copy the content below / 下の枠内をコピー**
 
----
-### T01: OAuth2プロバイダー追加
+━━━━━━━━━━ ✂ COPY START ✂ ━━━━━━━━━━
 
-リポジトリ: {repo}
-ブランチ: cc/{timestamp}/t01-oauth2
+Repository: myapp
 
-## タスク
-OAuth2プロバイダーを追加
+Add OAuth2 provider (Google).
 
-## Scope
-- 触ってよい: src/auth/providers/, config/oauth.ts
-- 触らない: src/auth/session/
+Scope:
+- Edit: src/auth/providers/, config/oauth.ts
+- Do NOT edit: src/auth/session/
 
-## Done
-- GoogleログインがOAuth2で動作
-- npm test -- auth/providers 通過
+Done when:
+- Google login works with OAuth2
+- npm test -- auth/providers passes
 
-完了したら git add/commit/push して gh pr create
+━━━━━━━━━━ ✂ COPY END ✂ ━━━━━━━━━━
 
----
-### T02: ...
+⚠️ After completion: Click "Create PR" button / 完了後: PRボタンをクリック
 ```
 
 ## Output Format
@@ -96,7 +81,6 @@ timestamp: "20260106-1500"
 tasks:
   - id: T01
     title: "OAuth2プロバイダー"
-    branch: "cc/20260106-1500/t01-oauth2"
     scope:
       include: ["src/auth/providers/"]
       exclude: ["src/auth/session/"]
@@ -122,10 +106,6 @@ merge_order: ["T01", "T02"]
 
 ```
 Plan: reports/plan-20260106-1500.yaml
-
-Branches created:
-  cc/20260106-1500/t01-oauth2 (pushed)
-  cc/20260106-1500/t02-redis (pushed)
 
 Web Prompts:
   [上記プロンプト表示]
