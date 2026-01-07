@@ -3,15 +3,31 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Claude Code](https://img.shields.io/badge/Claude%20Code-Skill-blue)](https://claude.ai/claude-code)
 
-## Manifesto
+**Learn project conventions from your conversation history, Git commits, and code.** Generate reusable skills that encode your team's decisions—with evidence links.
 
-A project is a living argument with itself.
+## Installation
 
-Every "don't do that" and every "we chose this" is part of its culture—usually lost, repeated, and paid for again.
+### Via Plugin (Recommended)
 
-**claude-skills** externalizes that memory: not as static doctrine, but as evidence-backed, reviewable guidance that can evolve, decay, and be forgotten.
+```bash
+# Add marketplace
+/plugin marketplace add usedhonda/claude-skills
 
-In the agent era, collaboration isn't just about writing code—it's about making decisions reproducible.
+# Install
+/plugin install skill-from-history@usedhonda-claude-skills
+```
+
+### Manual Installation
+
+```bash
+# Global (all projects)
+mkdir -p ~/.claude/skills/skill-from-history
+cp -r skills/skill-from-history/* ~/.claude/skills/skill-from-history/
+
+# Project-specific
+mkdir -p .claude/skills/skill-from-history
+cp -r skills/skill-from-history/* .claude/skills/skill-from-history/
+```
 
 ## Principles
 
@@ -142,30 +158,6 @@ Or say: "履歴からスキル作成", "analyze patterns", "learn from history"
 
 Or say: "並列開発", "parallel tasks", "task decomposition"
 
-## Installation
-
-### Via Plugin (Recommended)
-
-```bash
-# Add marketplace
-/plugin marketplace add usedhonda/claude-skills
-
-# Install
-/plugin install skill-from-history@usedhonda-claude-skills
-```
-
-### Manual Installation
-
-```bash
-# Global (all projects)
-mkdir -p ~/.claude/skills/skill-from-history
-cp -r skills/skill-from-history/* ~/.claude/skills/skill-from-history/
-
-# Project-specific
-mkdir -p .claude/skills/skill-from-history
-cp -r skills/skill-from-history/* .claude/skills/skill-from-history/
-```
-
 ## Requirements
 
 - [Claude Code](https://claude.ai/claude-code) (Pro, Max, Team, or Enterprise)
@@ -178,6 +170,16 @@ Issues and PRs are welcome!
 ## License
 
 MIT License - see [LICENSE](LICENSE)
+
+## Philosophy
+
+A project is a living argument with itself.
+
+Every "don't do that" and every "we chose this" is part of its culture—usually lost, repeated, and paid for again.
+
+**claude-skills** externalizes that memory: not as static doctrine, but as evidence-backed, reviewable guidance that can evolve, decay, and be forgotten.
+
+In the agent era, collaboration isn't just about writing code—it's about making decisions reproducible.
 
 ---
 
