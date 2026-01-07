@@ -1,6 +1,6 @@
 ---
 name: skill-from-history
-description: Analyzes Claude Code conversation history, git commits, and codebase to identify recurring patterns and generate project-specific agents and skills. Invoke with "/gen-all", "/gen-agents", "/gen-skills", or when user asks to "create skills from history", "analyze patterns", "generate agents".
+description: Analyzes Claude Code conversation history, git commits, and codebase to identify recurring patterns and generate project-specific agents and skills. Invoke with "/skill-from-history:learn-gen" or when user asks to "create skills from history", "analyze patterns", "generate agents".
 compression-anchors:
   - "Output: .claude/agents/[name]/AGENT.md + .claude/skills/[name]/SKILL.md"
   - "9-step process: Gather→Agents→Skills→Conflict→Propose→Generate"
@@ -20,9 +20,9 @@ A meta-skill that discovers recurring patterns from your project's history and g
 **Process**: 9 steps (Gather → Agents → Skills → Conflict → Propose → Generate)
 
 **Quick Actions**:
-- `/gen-all` - Generate agents + skills (recommended)
-- `/gen-agents` - Agents only
-- `/gen-skills` - Skills only
+- `/skill-from-history:learn-gen` - Generate agents + skills (recommended)
+- `/skill-from-history:learn-gen --agents` - Agents only
+- `/skill-from-history:learn-gen --skills` - Skills only
 
 ## When to Use
 
@@ -342,9 +342,9 @@ Override は記録され、Staleness スコアに影響する。
 制約の有効性を検証するテストスイート：
 
 ```bash
-$ /skill-eval           # Golden Tasks 実行
-$ /skill-eval --baseline  # ベースライン比較
-$ /skill-eval --regression CONS-NEW  # 回帰テスト
+$ /skill-from-history:learn-check           # Golden Tasks 実行
+$ /skill-from-history:learn-check --baseline  # ベースライン比較
+$ /skill-from-history:learn-check --regression CONS-NEW  # 回帰テスト
 ```
 
 詳細は [references/lifecycle.md](references/lifecycle.md) と [references/golden-tasks.md](references/golden-tasks.md) を参照。
@@ -405,7 +405,7 @@ Essential points for context retention:
 - **Agent output**: `.claude/agents/[name]/AGENT.md` (generated first)
 - **Skill output**: `.claude/skills/[name]/SKILL.md` (can reference agents)
 - **Bidirectional**: Agent→Skill (`skills:` field) and Skill→Agent (`agents:` field)
-- **Commands**: `/gen-all`, `/gen-agents`, `/gen-skills`, `/skill-eval`, `/skill-promote`, `/skill-globalize`, `/skill-import`
+- **Commands**: `/skill-from-history:learn-status`, `learn-init`, `learn-gen`, `learn-check`, `learn-promote`
 - **Governance**: Maturity (Draft→Accepted→Canonical→Deprecated), Epochs, Staleness
 - **Workflow**: Observe → Draft → Promote → Refine
 - **Promotion rule**: Eval Pass + Staleness Check + Rationale required

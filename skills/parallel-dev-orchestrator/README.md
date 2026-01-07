@@ -1,25 +1,28 @@
 # parallel-dev-orchestrator
 
-Boris流CLI⇄Web並列開発ワークフローを実現するClaude Codeスキル。
+並列開発ワークフローを実現するClaude Codeスキル。
 
 ## 概要
 
 大きなタスクを分解し、複数のClaude Codeセッションで並列開発を行い、自動マージまでを管理します。
 
 ```
-/orchestrate "認証システムをOAuth2対応に"
+/parallel-dev-orchestrator:par-plan "認証システムをOAuth2対応に"
      │
      ▼
-  Plan (タスク分解)
+  Plan (タスク分解) → reports/plan-YYYYMMDD-HHMM.yaml
      │
      ▼
-  Dispatch (並列投入)
+/parallel-dev-orchestrator:par-dispatch
      │
      ▼
-  Monitor (PR監視)
+  Dispatch (並列投入) → 各worktreeでclaude起動
      │
      ▼
-  Harvest (マージ・レポート)
+/parallel-dev-orchestrator:par-harvest --watch
+     │
+     ▼
+  Harvest (マージ・レポート) → reports/harvest-YYYYMMDD-HHMM.md
 ```
 
 ## 前提条件
@@ -39,15 +42,20 @@ Boris流CLI⇄Web並列開発ワークフローを実現するClaude Codeスキ�
 ## クイックスタート
 
 ```bash
-# フルワークフロー
-/orchestrate "ユーザー認証をOAuth2対応にする"
+# 1. 環境チェック
+/parallel-dev-orchestrator:par-init
 
-# 既存プランから再開
-/orchestrate --resume
+# 2. タスク分解
+/parallel-dev-orchestrator:par-plan "ユーザー認証をOAuth2対応にする"
 
-# 個別コマンド
-/dispatch --task T01
-/harvest --watch
+# 3. 並列セッションに投入
+/parallel-dev-orchestrator:par-dispatch
+
+# 4. PRを監視・マージ
+/parallel-dev-orchestrator:par-harvest --watch
+
+# ステータス確認
+/parallel-dev-orchestrator:par-status
 ```
 
 ## Dispatch方式
@@ -72,9 +80,11 @@ cd .worktrees/t01 && claude
 
 | コマンド | 説明 |
 |---------|------|
-| `/orchestrate` | フルワークフロー実行 |
-| `/dispatch` | タスク投入のみ |
-| `/harvest` | PR収集・レポート生成 |
+| `/parallel-dev-orchestrator:par-status` | アクティブなプラン・PR状況を表示 |
+| `/parallel-dev-orchestrator:par-init` | GitHub前提条件をチェック |
+| `/parallel-dev-orchestrator:par-plan` | Epic → plan.yaml に分解 |
+| `/parallel-dev-orchestrator:par-dispatch` | セッションにタスク投入 |
+| `/parallel-dev-orchestrator:par-harvest` | PRをマージしレポート生成 |
 
 ## ファイル構成
 
@@ -91,34 +101,37 @@ skills/parallel-dev-orchestrator/
 ### 例1: 認証機能の並列開発
 
 ```bash
-# Step 1: オーケストレーション開始
-/orchestrate "ユーザー認証をOAuth2 + Redis対応に"
+# Step 1: 環境チェック
+/parallel-dev-orchestrator:par-init
 
-# Step 2: plan.yamlが生成される
+# Step 2: タスク分解
+/parallel-dev-orchestrator:par-plan "ユーザー認証をOAuth2 + Redis対応に"
+
+# Step 3: plan.yamlが生成される
 # reports/plan-20260105-1400.yaml
 #   T01: OAuth2プロバイダー追加
 #   T02: セッションRedis移行
 #   T03: 認証E2Eテスト
 
-# Step 3: worktree作成・並列作業
+# Step 4: worktree作成・並列作業
 git worktree add .worktrees/t01 cc/20260105-1400/t01-oauth2
 git worktree add .worktrees/t02 cc/20260105-1400/t02-redis
 
-# Step 4: 別ターミナルで claude 起動
+# Step 5: 別ターミナルで claude 起動
 cd .worktrees/t01 && claude  # T01担当
 cd .worktrees/t02 && claude  # T02担当
 
-# Step 5: PR作成 → auto-merge待ち
-/harvest --watch
+# Step 6: PR作成 → auto-merge待ち
+/parallel-dev-orchestrator:par-harvest --watch
 
-# Step 6: レポート確認
-cat reports/20260105-1400-report.md
+# Step 7: レポート確認
+cat reports/harvest-20260105-1400.md
 ```
 
 ### 例2: ドキュメント並列更新
 
 ```bash
-/orchestrate "READMEとAPIドキュメントを更新"
+/parallel-dev-orchestrator:par-plan "READMEとAPIドキュメントを更新"
 
 # 生成されるタスク:
 #   T01: README更新
@@ -128,17 +141,17 @@ cat reports/20260105-1400-report.md
 # scopeが完全分離なので安全に並列実行
 ```
 
-### 例3: 既存プランから再開
+### 例3: 特定タスクのみ再投入
 
 ```bash
-# 前回の作業を再開
-/orchestrate --resume
+# 現状確認
+/parallel-dev-orchestrator:par-status
 
 # 特定タスクのみ再投入
-/dispatch --task T02
+/parallel-dev-orchestrator:par-dispatch --task T02
 
 # レポートのみ生成（マージしない）
-/harvest --report-only
+/parallel-dev-orchestrator:par-harvest --report-only
 ```
 
 ## 詳細ドキュメント

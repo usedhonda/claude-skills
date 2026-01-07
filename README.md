@@ -67,51 +67,80 @@ Long contexts lose focus in the middle. We anchor critical decisions at the edge
 
 ### [skill-from-history](skills/skill-from-history/SKILL.md)
 
-> **Project-Specific Skill Generator** - The meta-skill that powers this philosophy.
+> **Project-Specific Skill Generator** - Analyze your conversation history, Git commits, and codebase to generate project-specific agents and skills.
 
-**Key Features:**
-- Multi-source analysis (conversations, Git, codebase)
-- Negative Learning (anti-pattern detection from corrections)
-- Evidence linking with `[E1][E2]` references
-- Review Gate for Critical constraints
-- Conflict detection and resolution
-- Command generation for frequently-used skills
+**What it does:**
+1. Reads your Claude Code conversation history
+2. Analyzes Git commit patterns
+3. Extracts recurring workflows and corrections
+4. Generates reusable agents (roles) and skills (workflows)
 
-**v3.0 Governance:**
-- Constraint Maturity (Draft → Accepted → Canonical → Deprecated)
-- Epochs (time-based rule archival)
-- Golden Tasks (evaluation harness)
-- Cross-Project Learning (global skills with quarantine)
-
-**Quick Start:**
+**Commands:**
 ```bash
-/gen-all        # Generate agents + skills
-/skill-eval     # Run Golden Tasks
-/skill-promote  # Promote validated constraints
+/skill-from-history:learn-status   # Check current learning state
+/skill-from-history:learn-init     # Initialize Golden Tasks harness
+/skill-from-history:learn-gen      # Generate agents/skills from history
+/skill-from-history:learn-check    # Run evaluation against Golden Tasks
+/skill-from-history:learn-promote  # Promote validated constraints
 ```
 
-Or say: "create skills from history", "analyze patterns"
-
-### [parallel-dev-orchestrator](skills/parallel-dev-orchestrator/SKILL.md) `v3.3.1`
-
-> **Boris-style CLI⇄Web Parallel Development** - Orchestrate multiple Claude Code sessions.
-
-**Key Features:**
-- Task decomposition with worktree-dispatcher agent
-- Multiple dispatch methods (& experimental, worktree, manual web)
-- Auto-merge via `gh pr merge --auto` with Risk Policy
-- When NOT to Use guidance (anti-patterns)
-- Recovery Playbook for common failures
-- Fail-closed guards for safety
-
-**Quick Start:**
+**Example workflow:**
 ```bash
-/orchestrate "Add OAuth2 authentication"
-/dispatch --task T01
-/harvest --watch
+# 1. Check what patterns exist
+/skill-from-history:learn-status
+
+# 2. Generate skills from your history
+/skill-from-history:learn-gen --skills
+
+# 3. Output: .claude/skills/{name}/SKILL.md
 ```
 
-Or say: "parallel development", "task decomposition"
+Or say: "履歴からスキル作成", "analyze patterns", "learn from history"
+
+---
+
+### [parallel-dev-orchestrator](skills/parallel-dev-orchestrator/SKILL.md)
+
+> **Parallel Development Workflow** - Decompose large tasks into parallel Claude Code sessions with auto-merge.
+
+**What it does:**
+1. Decomposes an epic into isolated tasks (T01, T02, ...)
+2. Creates branches and worktrees for each task
+3. Dispatches tasks to multiple Claude Code sessions
+4. Auto-merges PRs based on risk policy
+
+**Commands:**
+```bash
+/parallel-dev-orchestrator:par-status    # Show active plans and PR status
+/parallel-dev-orchestrator:par-init      # Check GitHub prerequisites
+/parallel-dev-orchestrator:par-plan      # Decompose epic → plan.yaml
+/parallel-dev-orchestrator:par-dispatch  # Submit tasks to sessions
+/parallel-dev-orchestrator:par-harvest   # Merge PRs and generate report
+```
+
+**Example workflow:**
+```bash
+# 1. Check environment is ready
+/parallel-dev-orchestrator:par-init
+
+# 2. Plan task decomposition
+/parallel-dev-orchestrator:par-plan "Add OAuth2 authentication"
+
+# 3. Dispatch to parallel sessions
+/parallel-dev-orchestrator:par-dispatch
+
+# 4. Watch and merge PRs
+/parallel-dev-orchestrator:par-harvest --watch
+```
+
+**Risk Policy:**
+| Level | Auto-merge | When |
+|-------|-----------|------|
+| low | ✅ | Isolated changes, CI passing |
+| medium | ✅ | + Required checks + scope isolation |
+| high | ❌ | Auth, payments, data deletion → manual review |
+
+Or say: "並列開発", "parallel tasks", "task decomposition"
 
 ## Installation
 
@@ -218,49 +247,78 @@ MIT License - see [LICENSE](LICENSE)
 
 ### [skill-from-history](skills/skill-from-history/SKILL.md)
 
-> **プロジェクト特化型スキル生成** - この思想を実現するメタスキル。
+> **プロジェクト特化型スキル生成** - 会話履歴・Git・コードベースを分析し、プロジェクト固有のスキルを自動生成。
 
-**主な機能:**
-- マルチソース分析（会話、Git、コードベース）
-- 負の学習（修正履歴からのアンチパターン検出）
-- 証拠リンク `[E1][E2]`
-- Critical制約のレビューゲート
-- 衝突検出と解決
-- 頻用スキルのコマンド生成
+**できること:**
+1. Claude Code会話履歴を読み込み
+2. Gitコミットパターンを分析
+3. 繰り返しのワークフローや修正を抽出
+4. 再利用可能なエージェント（役割）とスキル（手順）を生成
 
-**v3.0 ガバナンス:**
-- 制約成熟度（Draft → Accepted → Canonical → Deprecated）
-- Epochs（時代ベースのルールアーカイブ）
-- Golden Tasks（評価ハーネス）
-- クロスプロジェクト学習（検疫付きグローバルスキル）
-
-**クイックスタート:**
+**コマンド:**
 ```bash
-/gen-all        # エージェント + スキル生成
-/skill-eval     # Golden Tasks実行
-/skill-promote  # 検証済み制約の昇格
+/skill-from-history:learn-status   # 現在の学習状態を確認
+/skill-from-history:learn-init     # Golden Tasksハーネスを初期化
+/skill-from-history:learn-gen      # 履歴からスキル生成
+/skill-from-history:learn-check    # Golden Tasks評価実行
+/skill-from-history:learn-promote  # 検証済み制約を昇格
+```
+
+**使い方の例:**
+```bash
+# 1. どんなパターンがあるか確認
+/skill-from-history:learn-status
+
+# 2. 履歴からスキルを生成
+/skill-from-history:learn-gen --skills
+
+# 3. 出力: .claude/skills/{name}/SKILL.md
 ```
 
 または「履歴からスキル作成」「パターン分析」と入力
 
-### [parallel-dev-orchestrator](skills/parallel-dev-orchestrator/SKILL.md) `v3.3.1`
+---
 
-> **Boris流CLI⇄Web並列開発** - 複数のClaude Codeセッションをオーケストレート。
+### [parallel-dev-orchestrator](skills/parallel-dev-orchestrator/SKILL.md)
 
-**主な機能:**
-- worktree-dispatcherエージェントによるタスク分解
-- 複数のdispatch方式（&試験的、worktree、手動web）
-- Risk Policyに基づく`gh pr merge --auto`
-- When NOT to Useガイド（アンチパターン）
-- Recovery Playbook（障害対応手順）
-- Fail-closedガード（安全装置）
+> **並列開発ワークフロー** - 大きなタスクを分解し、複数のClaude Codeセッションで並列実行→自動マージ。
 
-**クイックスタート:**
+**できること:**
+1. Epicを独立したタスク（T01, T02, ...）に分解
+2. 各タスク用のブランチとworktreeを作成
+3. 複数のClaude Codeセッションにタスクを投入
+4. リスクポリシーに基づいてPRを自動マージ
+
+**コマンド:**
 ```bash
-/orchestrate "OAuth2認証を追加"
-/dispatch --task T01
-/harvest --watch
+/parallel-dev-orchestrator:par-status    # アクティブなプラン・PR状況を表示
+/parallel-dev-orchestrator:par-init      # GitHub前提条件をチェック
+/parallel-dev-orchestrator:par-plan      # Epic → plan.yaml に分解
+/parallel-dev-orchestrator:par-dispatch  # セッションにタスク投入
+/parallel-dev-orchestrator:par-harvest   # PRをマージしレポート生成
 ```
+
+**使い方の例:**
+```bash
+# 1. 環境が準備できているか確認
+/parallel-dev-orchestrator:par-init
+
+# 2. タスク分解を計画
+/parallel-dev-orchestrator:par-plan "OAuth2認証を追加"
+
+# 3. 並列セッションに投入
+/parallel-dev-orchestrator:par-dispatch
+
+# 4. PRを監視・マージ
+/parallel-dev-orchestrator:par-harvest --watch
+```
+
+**リスクポリシー:**
+| レベル | 自動マージ | 条件 |
+|--------|-----------|------|
+| low | ✅ | 影響範囲が限定的、CI通過 |
+| medium | ✅ | + 必須チェック + スコープ分離 |
+| high | ❌ | 認証・決済・データ削除 → 手動レビュー必須 |
 
 または「並列開発」「タスク分解」と入力
 

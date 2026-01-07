@@ -1,9 +1,9 @@
 ---
 name: parallel-dev-orchestrator
 description: |
-  Boris流CLI⇄Web並列開発ワークフロー。
+  並列開発ワークフロー。
   タスク分解→ブランチ作成→並列投入→auto-merge→レポート。
-  "/orchestrate", "並列開発", "タスク分解", "parallel development"で発動。
+  "/parallel-dev-orchestrator:par-plan", "並列開発", "タスク分解"で発動。
 compression-anchors:
   - "& でWeb投入、失敗時はworktreeフォールバック"
   - "Plan→Dispatch→Monitor→Harvest"
@@ -30,7 +30,7 @@ CLI⇄Web並列開発を自動化するBoris流ワークフロー。
 - 1つの大きな機能を分割して開発したい
 - Claude Code Webも活用して開発速度を上げたい
 
-**Trigger phrases**: `/orchestrate`, `並列開発`, `タスク分解`, `parallel tasks`
+**Trigger phrases**: `/parallel-dev-orchestrator:par-plan`, `並列開発`, `タスク分解`, `parallel tasks`
 
 ---
 
@@ -59,13 +59,13 @@ CLI⇄Web並列開発を自動化するBoris流ワークフロー。
 |------|------------|----------|----------------|
 | **low** | ✅ 許可 | CI通過 | `--watch` で監視 |
 | **medium** | ✅ 許可 | CI通過 + required checks | PR内容を軽く確認 |
-| **high** | ❌ 禁止 | 手動レビュー必須 | `/harvest --report-only` で状況確認後、手動マージ |
+| **high** | ❌ 禁止 | 手動レビュー必須 | `/parallel-dev-orchestrator:par-harvest --report-only` で状況確認後、手動マージ |
 
 **High riskの例**: 認証/決済/データ削除/外部API連携/本番設定変更
 
 **運用ルール詳細**:
 - **medium**: 差分の目視確認 + 主要テスト通過 + 影響範囲がscope内であること
-- **high**: 最低1 approval必須、squashマージ固定、`/harvest`は`--auto`を実行しない
+- **high**: 最低1 approval必須、squashマージ固定、`par-harvest`は`--auto`を実行しない
 
 ```yaml
 # plan.yaml でのrisk指定
@@ -74,7 +74,7 @@ tasks:
     risk: high  # → auto-merge対象外、手動レビュー必須
 ```
 
-> **実装**: `risk: high` のタスクに対して `/harvest` は `gh pr merge --auto` を実行しない
+> **実装**: `risk: high` のタスクに対して `par-harvest` は `gh pr merge --auto` を実行しない
 
 ---
 
@@ -125,7 +125,7 @@ brew install jq  # macOS
 
 ```
 ┌─────────────────────────────────────────────────────────┐
-│  /orchestrate "認証機能をOAuth2対応に"                    │
+│  /parallel-dev-orchestrator:par-plan "認証機能をOAuth2対応に" │
 └─────────────────────────────────────────────────────────┘
                           │
                           ▼
@@ -175,23 +175,29 @@ brew install jq  # macOS
 
 ## Quick Start
 
-### 1. フルワークフロー
-
-```
-/orchestrate "ユーザー認証をOAuth2対応にする"
-```
-
-### 2. 既存プランから再開
-
-```
-/orchestrate --resume
-```
-
-### 3. 個別コマンド
+### 1. 環境チェック
 
 ```bash
-/dispatch --task T01          # 特定タスクのみ投入
-/harvest --watch              # 監視モードでマージ待ち
+/parallel-dev-orchestrator:par-init
+```
+
+### 2. タスク分解
+
+```bash
+/parallel-dev-orchestrator:par-plan "ユーザー認証をOAuth2対応にする"
+```
+
+### 3. 並列投入
+
+```bash
+/parallel-dev-orchestrator:par-dispatch
+/parallel-dev-orchestrator:par-dispatch --task T01  # 特定タスクのみ
+```
+
+### 4. PRマージ
+
+```bash
+/parallel-dev-orchestrator:par-harvest --watch  # 監視モードでマージ待ち
 ```
 
 ---
@@ -313,7 +319,7 @@ gh pr list --state open
 # リカバリ
 git worktree remove .worktrees/t01  # 問題のworktree削除
 git branch -D cc/xxx/t01-xxx        # ブランチ削除
-# → 再度 /dispatch --task T01
+# → 再度 /parallel-dev-orchestrator:par-dispatch --task T01
 ```
 
 ### 2. PRがコンフリクト
@@ -357,10 +363,11 @@ git push
 
 ```bash
 # 現状確認
-/harvest --report-only
+/parallel-dev-orchestrator:par-status
+/parallel-dev-orchestrator:par-harvest --report-only
 
 # 完了タスクを確認し、残りを再投入
-/dispatch --task T03 --task T04
+/parallel-dev-orchestrator:par-dispatch --task T03 --task T04
 ```
 
 ### 6. リモート後始末（完全クリーンアップ）
@@ -385,9 +392,9 @@ git branch -D cc/xxx/t01-xxx  # ローカルブランチ削除
 
 | ファイル | 説明 | 生成タイミング |
 |----------|------|----------------|
-| `reports/plan-{timestamp}.yaml` | タスク分解結果 | /orchestrate Phase 1 |
-| `.worktrees/t{N}/` | 並列作業ディレクトリ | /dispatch (worktree方式) |
-| `reports/{timestamp}-report.md` | 完了レポート | /harvest |
+| `reports/plan-{timestamp}.yaml` | タスク分解結果 | par-plan |
+| `.worktrees/t{N}/` | 並列作業ディレクトリ | par-dispatch (worktree方式) |
+| `reports/harvest-{timestamp}.md` | 完了レポート | par-harvest |
 
 ---
 
@@ -395,9 +402,11 @@ git branch -D cc/xxx/t01-xxx  # ローカルブランチ削除
 
 | コマンド | 説明 |
 |---------|------|
-| `/orchestrate` | フルワークフロー実行 |
-| `/dispatch` | タスク投入のみ |
-| `/harvest` | PR収集・レポート生成 |
+| `/parallel-dev-orchestrator:par-status` | 現在のプラン・PR状況を表示 |
+| `/parallel-dev-orchestrator:par-init` | 環境チェック |
+| `/parallel-dev-orchestrator:par-plan` | タスク分解 |
+| `/parallel-dev-orchestrator:par-dispatch` | タスク投入 |
+| `/parallel-dev-orchestrator:par-harvest` | PR収集・マージ・レポート生成 |
 
 ---
 
