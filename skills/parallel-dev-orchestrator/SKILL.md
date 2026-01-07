@@ -222,23 +222,28 @@ CLIで並列実行したい場合:
 `/par-plan` で自動生成されるプロンプトを claude.ai/code に貼り付け:
 
 ```
-T01: OAuth2プロバイダー追加
+# Session 1: T01
 
-リポジトリ: myapp
-ブランチ: cc/20260105-1400/t01-oauth2
+**Copy the content below / 下の枠内をコピー**
 
-## タスク
-OAuth2プロバイダー(Google)を追加
+━━━━━━━━━━ ✂ COPY START ✂ ━━━━━━━━━━
 
-## Scope
-触ってよい: src/auth/, config/oauth.ts
-触らない: src/auth/legacy/
+Repository: myapp
+Branch: cc/20260105-1400/t01-oauth2
 
-## Done
-- OAuth2ログインがGoogle対応
-- テスト通過: npm test -- auth
+Add OAuth2 provider (Google).
 
-完了後: git add/commit/push → gh pr create
+Scope:
+- Edit: src/auth/, config/oauth.ts
+- Do NOT edit: src/auth/legacy/
+
+Done when:
+- Google login works with OAuth2
+- npm test -- auth passes
+
+Create PR when done.
+
+━━━━━━━━━━ ✂ COPY END ✂ ━━━━━━━━━━
 ```
 
 ### 方式2: Git Worktree（CLI並列実行）
