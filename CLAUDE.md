@@ -2,7 +2,7 @@
 
 Claude Code plugin marketplace for project-specific skills.
 
-## Command Structure (v4.1.0)
+## Command Structure (v4.2.0)
 
 ### Plugin-Specific Commands
 
@@ -122,6 +122,8 @@ Usage and documentation...
 
 ### 5. Update marketplace.json
 
+**CRITICAL**: Each plugin MUST have `commands` and `agents` fields, or commands won't work in other projects!
+
 ```json
 {
   "plugins": [
@@ -129,11 +131,22 @@ Usage and documentation...
       "name": "{skill-name}",
       "description": "{one-line description}",
       "source": "./",
-      "skills": ["./skills/{skill-name}"]
+      "skills": ["./skills/{skill-name}"],
+      "commands": ["./skills/{skill-name}/commands/"],
+      "agents": ["./agents/{agent-name}"]
     }
   ]
 }
 ```
+
+| Field | Required | Notes |
+|-------|----------|-------|
+| `name` | ✅ | Must match skill directory name |
+| `description` | ✅ | One-line description |
+| `source` | ✅ | Always `"./"` |
+| `skills` | ✅ | Path to SKILL.md directory |
+| `commands` | ✅ | Path to commands/ directory (empty array `[]` if none) |
+| `agents` | ✅ | Path to agent directories (empty array `[]` if none) |
 
 ### 6. Bump Version
 
@@ -167,28 +180,57 @@ Both files must have matching version:
 
 ## Pre-Release Checklist
 
+**Run this BEFORE every commit:**
+
 ```bash
-# 1. Check for command duplication
-for cmd in $(ls skills/*/commands/*.md | xargs -n1 basename | sort -u); do
-  count=$(find . -name "$cmd" -type f | wc -l)
-  if [ "$count" -gt 1 ]; then
-    echo "DUPLICATE: $cmd"
-    find . -name "$cmd" -type f
+# === CRITICAL: Config Consistency Check ===
+echo "=== Version Check ==="
+settings_ver=$(jq -r '.version' .claude-plugin/settings.json)
+marketplace_ver=$(jq -r '.metadata.version' .claude-plugin/marketplace.json)
+if [ "$settings_ver" != "$marketplace_ver" ]; then
+  echo "❌ VERSION MISMATCH: settings=$settings_ver marketplace=$marketplace_ver"
+  exit 1
+else
+  echo "✅ Version: $settings_ver"
+fi
+
+echo ""
+echo "=== marketplace.json Plugin Fields Check ==="
+jq -r '.plugins[] | "\(.name): commands=\(.commands // "MISSING!") agents=\(.agents // "MISSING!")"' .claude-plugin/marketplace.json
+
+echo ""
+echo "=== Commands Path Validation ==="
+for plugin in $(jq -r '.plugins[].name' .claude-plugin/marketplace.json); do
+  cmd_path=$(jq -r --arg p "$plugin" '.plugins[] | select(.name==$p) | .commands[0]' .claude-plugin/marketplace.json)
+  if [ "$cmd_path" = "null" ] || [ -z "$cmd_path" ]; then
+    echo "❌ $plugin: commands field MISSING in marketplace.json!"
+  elif [ ! -d "${cmd_path#./}" ]; then
+    echo "❌ $plugin: commands path not found: $cmd_path"
+  else
+    count=$(ls "${cmd_path#./}"/*.md 2>/dev/null | wc -l)
+    echo "✅ $plugin: $count commands in $cmd_path"
   fi
 done
 
-# 2. Verify SKILL.md frontmatter
-for skill in skills/*/SKILL.md; do
-  echo "=== $skill ==="
-  head -10 "$skill"
+echo ""
+echo "=== Command Duplication Check ==="
+for cmd in $(ls skills/*/commands/*.md 2>/dev/null | xargs -n1 basename | sort | uniq -d); do
+  echo "❌ DUPLICATE: $cmd"
+  find . -name "$cmd" -type f
 done
 
-# 3. Cross-reference check
-echo "=== Agents referenced in skills ==="
-grep -r "agents:" skills/*/SKILL.md
+echo ""
+echo "=== Skills ↔ Agents Cross-Reference ==="
+grep -h "agents:" skills/*/SKILL.md 2>/dev/null | grep -v "^#"
+grep -h "skills:" agents/*/AGENT.md 2>/dev/null | grep -v "^#"
+```
 
-echo "=== Skills referenced in agents ==="
-grep -r "skills:" agents/*/AGENT.md
+### Quick Validation (One-liner)
+
+```bash
+# Fast check - run before git push
+missing=$(jq '[.plugins[] | select(.commands == null or .agents == null) | .name]' .claude-plugin/marketplace.json)
+[ "$missing" = "[]" ] && echo "✅ OK" || echo "❌ FAIL: missing commands/agents: $missing"
 ```
 
 ---
@@ -295,3 +337,4 @@ EOF
 | Plugin source overlap | - | All use `source: "./"` - commands must be in ONE location |
 | Command fragmentation (v4.0.0) | - | Unified into `/cs-learn-skills` and `/cs-run-parallel` |
 | Command duplication (v4.1.0) | - | Split to plugin-specific: `learn-*` / `par-*` |
+| **marketplace.json missing commands/agents** | 33d2fef | Add `commands` and `agents` fields to each plugin (v4.2.0) |
