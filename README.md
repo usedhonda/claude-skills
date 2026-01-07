@@ -185,7 +185,7 @@ In the agent era, collaboration isn't just about writing code—it's about makin
 
 # 日本語
 
-## マニフェスト
+## なぜ作ったか
 
 プロジェクトは、自分自身との対話である。
 
@@ -356,3 +356,7 @@ cp -r skills/skill-from-history/* .claude/skills/skill-from-history/
 ## コントリビュート
 
 Issue・PR歓迎！
+
+## ライセンス
+
+MIT License - [LICENSE](LICENSE) 参照
