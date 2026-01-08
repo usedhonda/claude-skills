@@ -10,6 +10,7 @@ compression-anchors:
   - "1タスク = 1ブランチ = 1PR"
 agents:
   - worktree-dispatcher
+  - parallel-planner
 ---
 
 # Parallel Dev Orchestrator

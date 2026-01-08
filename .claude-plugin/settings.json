@@ -1,6 +1,6 @@
 {
   "name": "claude-skills",
-  "version": "4.2.1",
+  "version": "4.5.0",
   "description": "A collection of Claude Code skills for enhanced development workflows",
   "skills": [
     {
@@ -16,6 +16,10 @@
     {
       "name": "worktree-dispatcher",
       "path": "agents/worktree-dispatcher"
+    },
+    {
+      "name": "parallel-planner",
+      "path": "agents/parallel-planner"
     }
   ],
   "commands": [
