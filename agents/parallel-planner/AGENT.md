@@ -2,7 +2,7 @@
 name: parallel-planner
 description: |
   並列タスク計画エージェント。プランモードで安全にコードベースを分析。
-  「並列計画」「parallel plan」「par-plan」で発動。
+  「Web並列」「web parallel」で発動。
 permissionMode: plan
 tools:
   - Read
