@@ -108,7 +108,7 @@ argument-hint: [optional args]
 Usage and documentation...
 ```
 
-### 4. Update settings.json
+### 4. Update plugin.json
 
 ```json
 {
@@ -151,7 +151,7 @@ Usage and documentation...
 ### 6. Bump Version
 
 Both files must have matching version:
-- `.claude-plugin/settings.json`
+- `.claude-plugin/plugin.json`
 - `.claude-plugin/marketplace.json`
 
 ---
@@ -185,7 +185,7 @@ Both files must have matching version:
 ```bash
 # === CRITICAL: Config Consistency Check ===
 echo "=== Version Check ==="
-settings_ver=$(jq -r '.version' .claude-plugin/settings.json)
+settings_ver=$(jq -r '.version' .claude-plugin/plugin.json)
 marketplace_ver=$(jq -r '.metadata.version' .claude-plugin/marketplace.json)
 if [ "$settings_ver" != "$marketplace_ver" ]; then
   echo "❌ VERSION MISMATCH: settings=$settings_ver marketplace=$marketplace_ver"
@@ -266,8 +266,8 @@ missing=$(jq '[.plugins[] | select(.commands == null or .agents == null) | .name
 # Check plugin status
 /plugin
 
-# Verify settings.json
-cat .claude-plugin/settings.json | jq '.commands'
+# Verify plugin.json
+cat .claude-plugin/plugin.json | jq '.commands'
 
 # List skill-specific commands
 ls -la skills/*/commands/
@@ -302,7 +302,7 @@ Content...
 EOF
 
 # 3. Create commands/ directory with {prefix}-*.md files
-# 4. Update settings.json (add to skills[], commands[])
+# 4. Update plugin.json (add to skills[], commands[])
 # 5. Update marketplace.json (add to plugins[])
 # 6. Bump version in both files
 ```
